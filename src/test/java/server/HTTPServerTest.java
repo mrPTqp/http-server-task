@@ -14,7 +14,6 @@ public class HTTPServerTest {
     @Test
     public void main() throws InterruptedException {
 
-
         ExecutorService executor = Executors.newFixedThreadPool(10);
         for (int i = 0; i < 5; i++) {
             executor.execute(new TestRunnableClientTester());
@@ -46,7 +45,7 @@ class TestRunnableClientTester implements Runnable {
             DataOutputStream oos = new DataOutputStream(socket.getOutputStream());
             DataInputStream ois = new DataInputStream(socket.getInputStream());
 
-            for (int i = 0; i < 5; i++) {
+            for (int i = 0; i < 3; i++) {
                 oos.writeUTF("clientCommand " + i);
                 oos.flush();
                 Thread.sleep(10);
