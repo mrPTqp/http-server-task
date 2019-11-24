@@ -1,11 +1,13 @@
 package server;
 
-import java.io.DataInputStream;
-import java.io.DataOutputStream;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.PrintWriter;
 import java.net.Socket;
+import java.util.StringTokenizer;
 
-public class HTTPParser implements Runnable{
+public class HTTPParser implements Runnable {
     private static Socket clientDialog;
 
     public HTTPParser(Socket client) {
@@ -15,8 +17,8 @@ public class HTTPParser implements Runnable{
     @Override
     public void run() {
         try {
-            DataOutputStream out = new DataOutputStream(clientDialog.getOutputStream());
-            DataInputStream in = new DataInputStream(clientDialog.getInputStream());
+            BufferedReader in = new BufferedReader(new InputStreamReader(clientDialog.getInputStream()));
+            PrintWriter out = new PrintWriter(clientDialog.getOutputStream());
 
 //            GET /wiki/страница HTTP/1.1
 //            Host: ru.wikipedia.org
@@ -26,16 +28,10 @@ public class HTTPParser implements Runnable{
 //            (пустая строка)
 
             while (!clientDialog.isClosed()) {
-                String entry = in.readUTF();
-                System.out.println("READ from clientDialog message:" + entry);
-
-                if (entry.equalsIgnoreCase("quit")) {
-                    System.out.println("Client initialize connection suicide");
-                    out.writeUTF("Server closed");
-                    break;
-                }
-
-                String headerMethod = entry
+                String input = in.readLine();
+                StringTokenizer parse = new StringTokenizer(input);
+                String method = parse.nextToken().toUpperCase();
+                String fileRequested = parse.nextToken().toLowerCase();
 
                 out.writeUTF("Server reply - " + entry + " - OK");
                 out.flush();
