@@ -9,7 +9,7 @@ import java.net.Socket;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class HTTPServerTest {
+public class HTTPServer12123213213Test {
 
     @Test
     public void main() throws InterruptedException {
