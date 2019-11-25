@@ -1,11 +1,10 @@
-package server;
+package auxiliary;
 
 import java.io.IOException;
 
 /**
  * Handlers must be thread safe.
  */
-public interface Handler  {
+public interface Handler {
     public void handle(Request request, Response response) throws IOException;
 }
-

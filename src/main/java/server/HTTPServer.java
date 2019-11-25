@@ -7,7 +7,7 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class HTTPServer12123213213 {
+public class HTTPServer {
     public static void main(String[] args) throws Throwable {
         int port = 8080;
         int coreNumberOfThreads = 2;
@@ -18,8 +18,12 @@ public class HTTPServer12123213213 {
                 keepAliveTime, TimeUnit.SECONDS, new SynchronousQueue<>());
 
         ServerSocket server = new ServerSocket(port);
+        System.out.println("Listening on port " + port);
         Socket client = server.accept();
-        executor.execute(new HTTPParser(client));
+        while (client != null) {
+            System.out.println("Received connection from " + client.getRemoteSocketAddress().toString());
+            executor.execute(new HTTPParser(client));
+        }
         executor.shutdown();
     }
 }
