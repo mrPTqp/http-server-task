@@ -1,5 +1,9 @@
 package auxiliary;
 
+import auxiliary.Handler;
+import auxiliary.Request;
+import auxiliary.Response;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -7,7 +11,7 @@ import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Map;
 
-class SocketHandler implements Runnable {
+public class SocketHandler implements Runnable {
     private Socket socket;
     private Handler defaultHandler;
     private Map<String, Map<String, Handler>> handlers;

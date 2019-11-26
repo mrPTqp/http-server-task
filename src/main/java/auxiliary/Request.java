@@ -10,8 +10,8 @@ public class Request {
     private String method;
     private String path;
     private String fullUrl;
-    private Map<String, String> headers = new HashMap<String, String>();
-    private Map<String, String> queryParameters = new HashMap<String, String>();
+    private Map<String, String> headers = new HashMap<>();
+    private Map<String, String> queryParameters = new HashMap<>();
     private BufferedReader in;
 
     public Request(BufferedReader in) {
