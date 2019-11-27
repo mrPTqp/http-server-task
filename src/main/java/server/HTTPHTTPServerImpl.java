@@ -9,21 +9,34 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
 public class HTTPHTTPServerImpl implements HTTPServer {
+    private int port;
+    private int coreNumberOfThreads;
+    private int maxNumberOfThreads;
+    private int keepAliveTime;
     private ExecutorService executor;
 
     public HTTPHTTPServerImpl(int port, int coreNumberOfThreads, int maxNumberOfThreads, int keepAliveTime) {
+        this.port = port;
+        this.coreNumberOfThreads = coreNumberOfThreads;
+        this.maxNumberOfThreads = maxNumberOfThreads;
+        this.keepAliveTime = keepAliveTime;
         this.executor = new ThreadPoolExecutor(coreNumberOfThreads, maxNumberOfThreads,
                 keepAliveTime, TimeUnit.SECONDS, new SynchronousQueue<>());
     }
 
-    @Override
-    public void start(int port, int coreNumberOfThreads, int maxNumberOfThreads, int keepAliveTime) throws IOException {
+    public static void main(String[] args) throws IOException {
         HTTPHTTPServerImpl server = new HTTPHTTPServerImpl(8080, 2, 8, 60);
+        server.start();
+    }
+
+    @Override
+    public void start() throws IOException {
+        int port = this.port;
         ServerSocket socket = new ServerSocket(port);
         Socket client;
         while ((client = socket.accept()) != null) {
             System.out.println("Received connection from " + client.getRemoteSocketAddress().toString());
-            executor.execute(new HTTPParserImpl(client));
+            executor.execute(new HTTPRequestParserImpl(client));
         }
         executor.shutdown();
     }
