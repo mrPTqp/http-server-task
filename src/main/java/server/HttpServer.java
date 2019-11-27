@@ -2,6 +2,6 @@ package server;
 
 import java.io.IOException;
 
-public interface HTTPServer {
+public interface HttpServer {
     void start() throws IOException;
 }

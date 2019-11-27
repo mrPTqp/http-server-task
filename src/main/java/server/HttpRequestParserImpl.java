@@ -8,7 +8,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.StringTokenizer;
 
-public class HTTPRequestParserImpl implements HTTPRequestParser, Runnable {
+public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
     private Socket client;
     private String method;
     private String URL;
@@ -17,7 +17,7 @@ public class HTTPRequestParserImpl implements HTTPRequestParser, Runnable {
     private Map<String, String> headers = new HashMap<>();
     private Map<String, String> queryParameters = new HashMap<>();
 
-    public HTTPRequestParserImpl(Socket client) {
+    public HttpRequestParserImpl(Socket client) {
         this.client = client;
     }
 
@@ -75,7 +75,7 @@ public class HTTPRequestParserImpl implements HTTPRequestParser, Runnable {
 
     @Override
     public void run() {
-        HTTPRequestParserImpl parser = new HTTPRequestParserImpl(client);
+        HttpRequestParserImpl parser = new HttpRequestParserImpl(client);
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             parser.parse(in);

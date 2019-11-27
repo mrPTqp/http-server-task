@@ -8,14 +8,14 @@ import java.util.concurrent.SynchronousQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 
-public class HTTPHTTPServerImpl implements HTTPServer {
+public class HttpServerImpl implements HttpServer {
     private int port;
     private int coreNumberOfThreads;
     private int maxNumberOfThreads;
     private int keepAliveTime;
     private ExecutorService executor;
 
-    public HTTPHTTPServerImpl(int port, int coreNumberOfThreads, int maxNumberOfThreads, int keepAliveTime) {
+    public HttpServerImpl(int port, int coreNumberOfThreads, int maxNumberOfThreads, int keepAliveTime) {
         this.port = port;
         this.coreNumberOfThreads = coreNumberOfThreads;
         this.maxNumberOfThreads = maxNumberOfThreads;
@@ -25,7 +25,7 @@ public class HTTPHTTPServerImpl implements HTTPServer {
     }
 
     public static void main(String[] args) throws IOException {
-        HTTPHTTPServerImpl server = new HTTPHTTPServerImpl(8080, 2, 8, 60);
+        HttpServerImpl server = new HttpServerImpl(8080, 2, 8, 60);
         server.start();
     }
 
@@ -36,7 +36,7 @@ public class HTTPHTTPServerImpl implements HTTPServer {
         Socket client;
         while ((client = socket.accept()) != null) {
             System.out.println("Received connection from " + client.getRemoteSocketAddress().toString());
-            executor.execute(new HTTPRequestParserImpl(client));
+            executor.execute(new HttpRequestParserImpl(client));
         }
         executor.shutdown();
     }
