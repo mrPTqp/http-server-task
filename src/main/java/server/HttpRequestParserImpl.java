@@ -1,14 +1,11 @@
 package server;
 
-import sun.nio.cs.UTF_8;
-
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.StringTokenizer;
 
 public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
     private Socket client;
@@ -34,7 +31,6 @@ public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
             return false;
         }
 
-        StringTokenizer tok = new StringTokenizer(initialLine);
         while (true) {
             String headerLine = in.readLine();
             if (headerLine.length() == 0) {
@@ -47,9 +43,10 @@ public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
             }
             headers.put(headerLine.substring(0, separator),
                     headerLine.substring(separator + 1));
+            System.out.println(headers);
         }
 
-        if (URL.indexOf("?") == -1) {
+        if (!URL.contains("?")) {
             path = URL;
         } else {
             path = URL.substring(0, URL.indexOf("?"));
