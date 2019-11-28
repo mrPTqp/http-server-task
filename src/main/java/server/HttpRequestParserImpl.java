@@ -1,5 +1,7 @@
 package server;
 
+import sun.nio.cs.UTF_8;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -24,15 +26,15 @@ public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
     @Override
     public boolean parse(BufferedReader in) throws IOException {
         String initialLine = in.readLine();
-        StringTokenizer tok = new StringTokenizer(initialLine);
-        if(tok.hasMoreElements()) {
-            method = tok.nextToken();
-            URL = tok.nextToken();
-            HTTPversion = tok.nextToken();
-        } else {
+        String[] partOfInit = initialLine.split(" ");
+        method = partOfInit[0];
+        URL = partOfInit[1];
+        HTTPversion = partOfInit[2];
+        if (method == null || URL == null || HTTPversion == null) {
             return false;
         }
 
+        StringTokenizer tok = new StringTokenizer(initialLine);
         while (true) {
             String headerLine = in.readLine();
             if (headerLine.length() == 0) {
@@ -79,6 +81,12 @@ public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
         try {
             BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
             parser.parse(in);
+            System.out.println(method);
+            System.out.println(URL);
+            System.out.println(path);
+            System.out.println(HTTPversion);
+            System.out.println(headers);
+            System.out.println(queryParameters);
         } catch (IOException e) {
             e.printStackTrace();
         }
