@@ -9,12 +9,12 @@ import java.util.Map;
 
 public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
     private Socket client;
-    private String method;
-    private String URL;
-    private String path;
-    private String HTTPversion;
-    private Map<String, String> headers = new HashMap<>();
-    private Map<String, String> queryParameters = new HashMap<>();
+    private static String method = null;
+    private static String URL = null;
+    private static String path = null;
+    private static String HTTPversion = null;
+    private static Map<String, String> headers = new HashMap<>();
+    private static Map<String, String> queryParameters = new HashMap<>();
 
     public HttpRequestParserImpl(Socket client) {
         this.client = client;
@@ -43,7 +43,6 @@ public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
             }
             headers.put(headerLine.substring(0, separator),
                     headerLine.substring(separator + 1));
-            System.out.println(headers);
         }
 
         if (!URL.contains("?")) {

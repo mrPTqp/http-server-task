@@ -17,13 +17,15 @@ public class HttpServerImplTest {
     public void main() throws IOException {
         String method = "GET";
         String URL = "https://localhost:8080";
+        String parameter1 = "name=dima";
+        String parameter2 = "age=27";
         String httpVersion = "HTTP/1.1";
         String host = "localhost";
         String accept = "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*";
         String acceptLanguage = "ru";
         Socket clientSocket = new Socket("localhost", 8080);
 
-        String getRequest = method + " " + URL + " " + httpVersion + "\n" + "Host: " +
+        String getRequest = method + " " + URL + "?" + parameter1 + "&" + parameter2 + " " + httpVersion + "\n" + "Host: " +
                 host + "\n" + "Accept: " + accept + "\n" + "Accept-Language: " + acceptLanguage + "\n\n";
         System.out.println(getRequest);
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
