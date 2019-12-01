@@ -1,4 +1,4 @@
-package server;
+package com.study.server;
 
 import java.io.IOException;
 import java.net.ServerSocket;
@@ -22,11 +22,6 @@ public class HttpServerImpl implements HttpServer {
         this.keepAliveTime = keepAliveTime;
         this.executor = new ThreadPoolExecutor(coreNumberOfThreads, maxNumberOfThreads,
                 keepAliveTime, TimeUnit.SECONDS, new SynchronousQueue<>());
-    }
-
-    public static void main(String[] args) throws IOException {
-        HttpServerImpl server = new HttpServerImpl(8080, 2, 8, 60);
-        server.start();
     }
 
     @Override

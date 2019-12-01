@@ -1,17 +1,13 @@
+package com.study.server;
+
 import org.junit.Test;
 
-import javax.sound.midi.Soundbank;
-import java.io.*;
-import java.net.HttpURLConnection;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
 import java.net.Socket;
-import java.net.URI;
-import java.net.URL;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
 
-public class HttpServerImplTest {
+public class MainTest {
 
     @Test
     public void main() throws IOException {
