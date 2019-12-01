@@ -7,8 +7,8 @@ import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
-public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
-    private Socket client;
+public class RequestParserImpl implements RequestParser {
+    private BufferedReader in;
     private static String method = null;
     private static String URL = null;
     private static String path = null;
@@ -16,8 +16,8 @@ public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
     private static Map<String, String> headers = new HashMap<>();
     private static Map<String, String> queryParameters = new HashMap<>();
 
-    public HttpRequestParserImpl(Socket client) {
-        this.client = client;
+    public RequestParserImpl(BufferedReader in) {
+        this.in = in;
     }
 
     @Override
@@ -56,6 +56,13 @@ public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
             path = "/index.html";
         }
 
+        System.out.println(method);
+        System.out.println(URL);
+        System.out.println(path);
+        System.out.println(HTTPversion);
+        System.out.println(headers);
+        System.out.println(queryParameters);
+
         return true;
     }
 
@@ -68,23 +75,6 @@ public class HttpRequestParserImpl implements HttpRequestParser, Runnable {
             } else {
                 queryParameters.put(parameter, null);
             }
-        }
-    }
-
-    @Override
-    public void run() {
-        HttpRequestParserImpl parser = new HttpRequestParserImpl(client);
-        try {
-            BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()));
-            parser.parse(in);
-            System.out.println(method);
-            System.out.println(URL);
-            System.out.println(path);
-            System.out.println(HTTPversion);
-            System.out.println(headers);
-            System.out.println(queryParameters);
-        } catch (IOException e) {
-            e.printStackTrace();
         }
     }
 }
