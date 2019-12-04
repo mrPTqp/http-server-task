@@ -6,11 +6,15 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
 import java.net.Socket;
+import java.util.concurrent.TimeUnit;
 
 public class MainTest {
 
     @Test
-    public void main() throws IOException {
+    public void main() throws IOException, InterruptedException {
+        HttpServerImpl server = new HttpServerImpl(8080, 2, 8, 60);
+        server.start();
+        TimeUnit.SECONDS.sleep(5);
         String method = "GET";
         String URL = "https://localhost:8080";
         String parameter1 = "name=dima";
@@ -21,8 +25,8 @@ public class MainTest {
         String acceptLanguage = "ru";
         Socket clientSocket = new Socket("localhost", 8080);
 
-        String getRequest = method + " " + URL + "?" + parameter1 + "&" + parameter2 + " " + httpVersion + "\n" + "Host: " +
-                host + "\n" + "Accept: " + accept + "\n" + "Accept-Language: " + acceptLanguage + "\n\n";
+        String getRequest = method + " " + URL + "?" + parameter1 + "&" + parameter2 + " " + httpVersion + "\n" +
+                "Host: " + host + "\n" + "Accept: " + accept + "\n" + "Accept-Language: " + acceptLanguage + "\n\n";
         System.out.println(getRequest);
         BufferedWriter out = new BufferedWriter(new OutputStreamWriter(clientSocket.getOutputStream()));
         out.write(getRequest);
