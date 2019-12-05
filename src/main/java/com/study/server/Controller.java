@@ -1,5 +1,10 @@
 package com.study.server;
 
-public interface Controller {
-    void getFile(String path);
+import com.study.server.http.Request;
+import com.study.server.http.Response;
+
+interface Controller {
+    boolean match(Request req);
+
+    Response handle(Request req);
 }

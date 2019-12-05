@@ -31,7 +31,7 @@ public class HttpServerImpl implements HttpServer {
         Socket client;
         while ((client = socket.accept()) != null) {
             System.out.println("Received connection from " + client.getRemoteSocketAddress().toString());
-            executor.execute(new RequestHandlerImpl(client));
+            executor.execute(new SocketHandlerImpl(client));
         }
         executor.shutdown();
     }

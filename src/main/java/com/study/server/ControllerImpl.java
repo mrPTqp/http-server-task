@@ -1,14 +1,17 @@
 package com.study.server;
 
-public class ControllerImpl implements Controller {
-    private String path;
+import com.study.server.http.Request;
+import com.study.server.http.Response;
 
-    public ControllerImpl(String path) {
-        this.path = path;
+public class ControllerImpl implements Controller {
+
+    @Override
+    public boolean match(Request req) {
+        return false;
     }
 
     @Override
-    public void getFile(String path) {
-
+    public Response handle(Request req) {
+        return null;
     }
 }

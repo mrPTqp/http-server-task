@@ -1,48 +1,41 @@
-package com.study.server;
+package com.study.server.http;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.Socket;
 import java.util.HashMap;
 import java.util.Map;
 
 public class RequestParserImpl implements RequestParser {
-    private BufferedReader in;
+    private String inputLine;
     private static String method = null;
     private static String URL = null;
     private static String path = null;
-    private static String HTTPversion = null;
+    private static String HttpVersion = null;
     private static Map<String, String> headers = new HashMap<>();
     private static Map<String, String> queryParameters = new HashMap<>();
 
-    public RequestParserImpl(BufferedReader in) {
-        this.in = in;
+    public RequestParserImpl(String inputLine) {
+        this.inputLine = inputLine;
     }
 
     @Override
-    public boolean parse(BufferedReader in) throws IOException {
-        String initialLine = in.readLine();
-        String[] partOfInit = initialLine.split(" ");
-        method = partOfInit[0];
-        URL = partOfInit[1];
-        HTTPversion = partOfInit[2];
-        if (method == null || URL == null || HTTPversion == null) {
-            return false;
-        }
+    public Request parse(String inputLine) {
+        String[] parts = inputLine.split("\n");
+        String[] partsFirstLine = inputLine.split(" ");
 
-        while (true) {
-            String headerLine = in.readLine();
+        method = partsFirstLine[0];
+        URL = partsFirstLine[1];
+        HttpVersion = partsFirstLine[2];
+
+        for (int i = 1; i < parts.length; i++) {
+            String headerLine = parts[i];
             if (headerLine.length() == 0) {
                 break;
             }
 
             int separator = headerLine.indexOf(":");
-            if (separator == -1) {
-                return false;
+            if (!(separator == -1)) {
+                headers.put(headerLine.substring(0, separator),
+                        headerLine.substring(separator + 1));
             }
-            headers.put(headerLine.substring(0, separator),
-                    headerLine.substring(separator + 1));
         }
 
         if (!URL.contains("?")) {
@@ -59,11 +52,13 @@ public class RequestParserImpl implements RequestParser {
         System.out.println(method);
         System.out.println(URL);
         System.out.println(path);
-        System.out.println(HTTPversion);
+        System.out.println(HttpVersion);
         System.out.println(headers);
         System.out.println(queryParameters);
 
-        return true;
+        Request request = new Request(method, URL, path, HttpVersion, headers, queryParameters);
+
+        return request;
     }
 
     private void parseQueryParameters(String queryString) {
