@@ -10,8 +10,8 @@ import java.net.Socket;
 public class SocketHandlerImpl implements SocketHandler, Runnable {
     private Socket client;
 
-    public SocketHandlerImpl(Socket client) {
-        this.client = client;
+    public SocketHandlerImpl(Socket clientSocket) {
+        this.clientSocket = clientSocket;
     }
 
     @Override
@@ -24,7 +24,8 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
     }
 
     private String readLine() {
-        try (final BufferedReader in = new BufferedReader(new InputStreamReader(client.getInputStream()))) {
+        try {
+            final BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
             String inputLine;
             final StringBuilder content = new StringBuilder();
             while (!(inputLine = in.readLine()).equals("")) {

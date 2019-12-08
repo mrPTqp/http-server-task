@@ -1,6 +1,8 @@
 package com.study.server;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -16,7 +18,6 @@ public class Main {
             Integer numberOfThreads = parametersOfHttpServer.get("numberOfThreads");
 
             HttpServerImpl server = new HttpServerImpl(port, numberOfThreads);
-            System.out.println("Server is started");
             server.start();
         }
     }
