@@ -9,6 +9,8 @@ import java.util.concurrent.Executors;
 public class HttpServerImpl implements HttpServer {
     private int port;
     private int numberOfThreads;
+    private boolean isStopped = false;
+    private ServerSocket serverSocket = null;
     private ExecutorService executor;
 
     public HttpServerImpl(int port, int numberOfThreads) {
@@ -18,15 +20,41 @@ public class HttpServerImpl implements HttpServer {
     }
 
     @Override
-    public void start() throws IOException {
-        int port = this.port;
-        ServerSocket serverSocket = new ServerSocket(port);
-        Socket clientSocket;
-        System.out.println("Server is started");
-        while ((clientSocket = serverSocket.accept()) != null) {
-            System.out.println("Received connection from " + clientSocket.getRemoteSocketAddress().toString());
-            executor.execute(new SocketHandlerImpl(clientSocket));
+    public void start() {
+        try {
+            this.serverSocket = new ServerSocket(this.port);
+        } catch (IOException e) {
+            throw new RuntimeException("Cannot open port " + this.port, e);
         }
-        executor.shutdown();
+
+        while (!isStopped()) {
+            Socket clientSocket = null;
+            try {
+                clientSocket = this.serverSocket.accept();
+            } catch (IOException e) {
+                if (isStopped()) {
+                    System.out.println("Server stopped");
+                    break;
+                }
+                throw new RuntimeException(
+                        "Error accepting client connection", e);
+            }
+            this.executor.execute(new SocketHandlerImpl(clientSocket));
+        }
+        this.executor.shutdown();
+        System.out.println("Server stopped");
+    }
+
+    private synchronized boolean isStopped() {
+        return this.isStopped;
+    }
+
+    public synchronized void stop() {
+        this.isStopped = true;
+        try {
+            this.serverSocket.close();
+        } catch (IOException e) {
+            throw new RuntimeException("Error closing server", e);
+        }
     }
 }
