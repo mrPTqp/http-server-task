@@ -58,7 +58,7 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             BufferedInputStream bis = new BufferedInputStream(fis);
             bis.read(myByteArray);
 
-            out.write(("HTTP/1.1 200 OK" + "\r\n").getBytes());
+            out.write(("HTTP/1.1 200 OK" + "\r\n\r\n").getBytes());
             out.write(myByteArray);
 
             out.close();
