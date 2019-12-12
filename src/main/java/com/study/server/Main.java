@@ -8,14 +8,15 @@ import java.util.Map;
 import java.util.Properties;
 
 public class Main {
-    static int defaultPort = 1234;
-    static int defaultNumberOfThreads = 20;
+    private static int defaultPort = 3333;
+    private static int defaultNumberOfThreads = 20;
+
     public static void main(String[] args) throws IOException {
         Map<String, Integer> parametersOfHttpServer;
         String sourceConfig = System.getenv().get("SitesAndConfigDirectory");
         parametersOfHttpServer = readProperties(sourceConfig);
 
-        if(parametersOfHttpServer != null) {
+        if (parametersOfHttpServer != null) {
             Integer port = parametersOfHttpServer.get("port");
             Integer numberOfThreads = parametersOfHttpServer.get("numberOfThreads");
 

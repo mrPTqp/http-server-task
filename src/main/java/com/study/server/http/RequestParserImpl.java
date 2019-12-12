@@ -8,24 +8,32 @@ public class RequestParserImpl implements RequestParser {
     private static String method = null;
     private static String URL = null;
     private static String path = null;
-    private static String HttpVersion = null;
+    private static String httpVersion = null;
+    private static String host = null;
     private static Map<String, String> headers = new HashMap<>();
     private static Map<String, String> queryParameters = new HashMap<>();
+    private Request request;
 
     public RequestParserImpl(String inputLine) {
         this.inputLine = inputLine;
     }
 
     @Override
-    public Request parse(String inputLine) {
+    public boolean parse(String inputLine) {
         String[] parts = inputLine.split("\n");
-        String[] partsFirstLine = inputLine.split(" ");
+        String[] partsFirstLine = parts[0].split(" ");
+        String[] partsSecondLine = parts[1].split(": ");
 
         method = partsFirstLine[0];
         URL = partsFirstLine[1];
-        HttpVersion = partsFirstLine[2];
+        httpVersion = partsFirstLine[2];
+        host = partsSecondLine[1];
 
-        for (int i = 1; i < parts.length; i++) {
+        if (method != "GET" || URL == null || httpVersion != "HTTP/1.1" || host == null) {
+            return false;
+        }
+
+        for (int i = 2; i < parts.length; i++) {
             String headerLine = parts[i];
             if (headerLine.length() == 0) {
                 break;
@@ -52,13 +60,14 @@ public class RequestParserImpl implements RequestParser {
         System.out.println(method);
         System.out.println(URL);
         System.out.println(path);
-        System.out.println(HttpVersion);
+        System.out.println(httpVersion);
+        System.out.println(host);
         System.out.println(headers);
         System.out.println(queryParameters);
 
-        Request request = new Request(method, URL, path, HttpVersion, headers, queryParameters);
+        request = new Request(method, URL, path, httpVersion, host, headers, queryParameters);
 
-        return request;
+        return true;
     }
 
     private void parseQueryParameters(String queryString) {
@@ -71,5 +80,9 @@ public class RequestParserImpl implements RequestParser {
                 queryParameters.put(parameter, null);
             }
         }
+    }
+
+    public Request getRequest() {
+        return request;
     }
 }
