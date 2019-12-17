@@ -39,12 +39,15 @@ public class HttpRequestParser implements RequestParser {
         request.setProtocol(requestElements[0]);
 
         Map<String, String> headers = new HashMap<>();
-        String[] headersLines = requestElements[1].trim().split("\\r?\\n");
+        requestElements = requestElements[1].trim().split("\r\n\r\n", 2);
+        String[] headersLines = requestElements[0].trim().split("\\r?\\n");
         for (String s : headersLines) {
             String[] headerParts = s.split(":\\s+", 2);
             headers.put(headerParts[0], headerParts[1]);
         }
         request.setHeaders(headers);
+
+        byte[]
 
         return Optional.empty();
     }
@@ -65,3 +68,35 @@ public class HttpRequestParser implements RequestParser {
         return sb.toString();
     }
 }
+
+//GET /path HTTP/1.1
+//        Host: localhost:8080
+//        cache-control: no-cache
+//        Postman-Token: 59703a7a-3a40-4977-aeda-4ca5f335675f
+
+//POST /path HTTP/1.1
+//        Host: localhost:8080
+//        cache-control: no-cache
+//        Postman-Token: 8f2fd50e-ca2f-454e-9ef9-254590e10236
+//        Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
+//
+//
+//        Content-Disposition: form-data; name="login"
+//
+//        lex
+//        ------WebKitFormBoundary7MA4YWxkTrZu0gW--,
+//        Content-Disposition: form-data; name="login"
+//
+//        lex
+//        ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+//        Content-Disposition: form-data; name="password"
+//
+//        ***&
+//        ------WebKitFormBoundary7MA4YWxkTrZu0gW--
+
+//PUT /new.html HTTP/1.1
+//        Host: example.com
+//        Content-type: text/html
+//        Content-length: 16
+//
+//<p>Новый файл</p>

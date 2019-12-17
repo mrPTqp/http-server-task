@@ -7,6 +7,7 @@ public class Request {
     private String path = null;
     private String protocol = null;
     private Map<String, String> headers;
+    private byte[] body;
 
     public String getMethod() {
         return method;
@@ -22,6 +23,10 @@ public class Request {
 
     public Map<String, String> getHeaders() {
         return headers;
+    }
+
+    public byte[] getBody() {
+        return body;
     }
 
     public Request() {
@@ -41,5 +46,9 @@ public class Request {
 
     public void setHeaders(Map<String, String> headers) {
         this.headers = headers;
+    }
+
+    public void setBody(byte[] body) {
+        this.body = body;
     }
 }
