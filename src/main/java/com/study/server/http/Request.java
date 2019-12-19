@@ -5,9 +5,14 @@ import java.util.Map;
 public class Request {
     private String method = null;
     private String path = null;
+    private Map<String, String> queryParameters = null;
     private String protocol = null;
-    private Map<String, String> headers;
-    private byte[] body;
+    private String host = null;
+    private Map<String, String> headers = null;
+    private String body = null;
+
+    public Request() {
+    }
 
     public String getMethod() {
         return method;
@@ -25,11 +30,16 @@ public class Request {
         return headers;
     }
 
-    public byte[] getBody() {
+    public String getBody() {
         return body;
     }
 
-    public Request() {
+    public String getHost() {
+        return host;
+    }
+
+    public Map<String, String> getQueryParameters() {
+        return queryParameters;
     }
 
     public void setMethod(String method) {
@@ -48,7 +58,15 @@ public class Request {
         this.headers = headers;
     }
 
-    public void setBody(byte[] body) {
+    public void setBody(String body) {
         this.body = body;
+    }
+
+    public void setHost(String host) {
+        this.host = host;
+    }
+
+    public void setQueryParameters(Map<String, String> queryParameters) {
+        this.queryParameters = queryParameters;
     }
 }

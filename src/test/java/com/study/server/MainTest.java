@@ -1,6 +1,7 @@
 package com.study.server;
 
-import org.junit.Test;
+
+import org.junit.jupiter.api.Test;
 
 import java.io.BufferedWriter;
 import java.io.IOException;
@@ -20,7 +21,7 @@ public class MainTest {
         String host = "localhost";
         String accept = "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*";
         String acceptLanguage = "ru";
-        Socket clientSocket = new Socket("localhost", 8080);
+        Socket clientSocket = new Socket("localhost", 3333);
 
         String getRequest = method + " " + URL + "?" + parameter1 + "&" + parameter2 + " " + httpVersion + "\n" +
                 "Host: " + host + "\n" + "Accept: " + accept + "\n" + "Accept-Language: " + acceptLanguage + "\n\n";
