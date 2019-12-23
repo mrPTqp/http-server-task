@@ -28,10 +28,11 @@ public class HttpRequestParser implements RequestParser {
         Map<String, String> headers = new HashMap<>();
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         Pattern methodPattern = Pattern.compile("^[A-Z]+");
-        Pattern pathPattern = Pattern.compile("\\/([a-z,\\/,\\d,.]+)?");
-        Pattern parametersPattern = Pattern.compile("[a-z\\d,.]+=[a-z\\d,.]+");
+        Pattern pathPattern = Pattern.compile("\\/([a-z\\/\\d.]+)?");
+        Pattern parametersPattern = Pattern.compile("[a-zA-Z\\d,.]+=[a-zA-Z\\d,.]+");
         Pattern protocolPattern = Pattern.compile("HTTP\\/[\\d].[\\d]");
         Pattern headersPattern = Pattern.compile(".+: .+");
+        Pattern hostPattern = Pattern.compile("^[\\w\\.-]+");
 
         try {
             String first = br.readLine();
@@ -76,23 +77,26 @@ public class HttpRequestParser implements RequestParser {
                 curLine = br.readLine();
             }
             request.setHeaders(headers);
-            request.setHost(headers.get("Host"));
+
+            String nonFormattedHost = headers.get("Host");
+            matcher = hostPattern.matcher(nonFormattedHost);
+            matcher.find();
+            String host = matcher.group(0).toLowerCase();
+            request.setHost(host);
 
             curLine = br.readLine();
             StringBuilder sb = new StringBuilder();
             while (curLine != null) {
-                sb.append(curLine + "\r\n");
+                sb.append(curLine).append("\r\n");
                 curLine = br.readLine();
             }
 
-            if (sb.toString().length() > 0) {
+            if (sb.toString().length() > 0 & !method.equals("GET") & !method.equals("DELETE")) {
                 request.setBody(sb.toString().stripTrailing());
             }
-
         } catch (IOException e) {
             throw new BadRequestException("Can't parse request");
         }
-
         return request;
     }
 }
