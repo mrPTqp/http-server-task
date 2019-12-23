@@ -1,15 +1,16 @@
 package com.study.server.http;
 
+import java.util.HashMap;
 import java.util.Map;
 
 public class Request {
-    private String method = null;
-    private String path = null;
-    private Map<String, String> queryParameters = null;
-    private String protocol = null;
-    private String host = null;
-    private Map<String, String> headers = null;
-    private String body = null;
+    private String method;
+    private String path;
+    private Map<String, String> queryParameters = new HashMap<>();
+    private String protocol;
+    private String host;
+    private Map<String, String> headers = new HashMap<>();
+    private String body;
 
     public Request() {
     }

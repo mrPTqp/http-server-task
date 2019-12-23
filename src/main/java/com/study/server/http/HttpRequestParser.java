@@ -8,6 +8,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class HttpRequestParser implements RequestParser {
     private static HttpRequestParser parser = new HttpRequestParser();
@@ -22,120 +24,75 @@ public class HttpRequestParser implements RequestParser {
     @Override
     public Request parse(InputStream in) {
         Request request = new Request();
-        String requestLine = convertRequestToString(in);
+        Map<String, String> queryParameters = new HashMap<>();
+        Map<String, String> headers = new HashMap<>();
+        BufferedReader br = new BufferedReader(new InputStreamReader(in));
+        Pattern methodPattern = Pattern.compile("^[A-Z]+");
+        Pattern pathPattern = Pattern.compile("\\/([a-z,\\/,\\d,.]+)?");
+        Pattern parametersPattern = Pattern.compile("[a-z\\d,.]+=[a-z\\d,.]+");
+        Pattern protocolPattern = Pattern.compile("HTTP\\/[\\d].[\\d]");
+        Pattern headersPattern = Pattern.compile(".+: .+");
+
         try {
-            String[] requestElements = requestLine.trim().split("\\s+", 2);
+            String first = br.readLine();
+            Matcher matcher = methodPattern.matcher(first);
+            matcher.find();
+            String method = matcher.group(0);
+            request.setMethod(method);
 
-            request.setMethod(requestElements[0]);
+            matcher = pathPattern.matcher(first);
+            matcher.find();
+            String path = matcher.group(0);
 
-            requestElements = requestElements[1].trim().split("\\s+", 2);
-
-            String path;
-            Map<String, String> queryParameters = new HashMap<>();
-//как парсить URI без слеша в конце пути?
-//а парсинг порта?
-            if (requestElements[0].contains("?")) {
-                String[] partsOfURI = requestElements[0].trim().split("\\?", 2);
-                path = partsOfURI[0].trim();
-
-                String parametersLine = partsOfURI[1].trim();
-                for (String parameter : parametersLine.split("&")) {
-                    int separator = parameter.indexOf('=');
-                    if (separator > -1) {
-                        queryParameters.put(parameter.substring(0, separator),
-                                parameter.substring(separator + 1));
-                    }
+            if (path != null) {
+                if (path.equals("/")) {
+                    path = path + "index.html";
                 }
-                request.setQueryParameters(queryParameters);
+                request.setPath(path);
             } else {
-                path = requestElements[0];
+                path = "/index.html";
+                request.setPath(path);
             }
 
-            if (path.endsWith("/")) {
-                path = path + "index.html";
+            matcher = parametersPattern.matcher(first);
+
+            while (matcher.find()) {
+                String[] partsOfParameters = matcher.group().split("=");
+                queryParameters.put(partsOfParameters[0], partsOfParameters[1]);
             }
-            request.setPath(path);
+            request.setQueryParameters(queryParameters);
 
-            requestElements = requestElements[1].trim().split("\\s+", 2);
-            request.setProtocol(requestElements[0]);
+            matcher = protocolPattern.matcher(first);
+            matcher.find();
+            String protocol = matcher.group(0);
+            request.setProtocol(protocol);
 
-            Map<String, String> headers = new HashMap<>();
-            requestElements = requestElements[1].trim().split("\r\n\r\n", 2);
-            String[] headersLines = requestElements[0].trim().split("\\r?\\n");
-            for (String s : headersLines) {
-                String[] headerParts = s.split(":\\s+", 2);
-                headers.put(headerParts[0], headerParts[1]);
+            String curLine = br.readLine();
+            while (!curLine.equals("")) {
+                matcher = headersPattern.matcher(curLine);
+                matcher.find();
+                String[] partsOfHeaders = matcher.group().split(": ");
+                headers.put(partsOfHeaders[0], partsOfHeaders[1]);
+                curLine = br.readLine();
             }
             request.setHeaders(headers);
+            request.setHost(headers.get("Host"));
 
-            String host = headers.get("Host");
-            request.setHost(host);
-
-            if (requestElements.length > 1) {
-                String body = requestElements[1];
-                request.setBody(body);
+            curLine = br.readLine();
+            StringBuilder sb = new StringBuilder();
+            while (curLine != null) {
+                sb.append(curLine + "\r\n");
+                curLine = br.readLine();
             }
 
-            return request;
-        } catch (Exception e) {
+            if (sb.toString().length() > 0) {
+                request.setBody(sb.toString().stripTrailing());
+            }
+
+        } catch (IOException e) {
             throw new BadRequestException("Can't parse request");
         }
-    }
 
-    private String convertRequestToString(InputStream in) {
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        StringBuilder sb = new StringBuilder();
-        String inputLine;
-
-        try {
-            while ((inputLine = br.readLine()) != null && !inputLine.trim().isEmpty()) {
-                sb.append(inputLine);
-                sb.append(System.lineSeparator());
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-        return sb.toString();
+        return request;
     }
 }
-
-// Примеры запросов:
-
-//GET /path HTTP/1.1
-//        Host: localhost:8080
-//        cache-control: no-cache
-//        Postman-Token: 59703a7a-3a40-4977-aeda-4ca5f335675f
-
-//POST /path HTTP/1.1
-//        Host: localhost:8080
-//        cache-control: no-cache
-//        Postman-Token: 8f2fd50e-ca2f-454e-9ef9-254590e10236
-//        Content-Type: multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW
-//
-//
-//        Content-Disposition: form-data; name="login"
-//
-//        lex
-//        ------WebKitFormBoundary7MA4YWxkTrZu0gW--,
-//        Content-Disposition: form-data; name="login"
-//
-//        lex
-//        ------WebKitFormBoundary7MA4YWxkTrZu0gW--
-//        Content-Disposition: form-data; name="password"
-//
-//        ***&
-//        ------WebKitFormBoundary7MA4YWxkTrZu0gW--
-
-//PUT /sample/put/json HTTP/1.1
-//        Authorization: Bearer mt0dgHmLJMVQhvjpNXDyA83vA_PxH23Y
-//        Accept: application/json
-//        Content-Type: application/json
-//        Content-Length: 85
-//        Host: reqbin.com
-//
-//        {
-//        "Id": 12345,
-//        "Customer": "John Smith",
-//        "Quantity": 1,
-//        "Price": 10.00
-//        }
