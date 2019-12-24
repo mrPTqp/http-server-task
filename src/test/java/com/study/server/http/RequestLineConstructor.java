@@ -1,6 +1,7 @@
 package com.study.server.http;
 
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
 
 class RequestLineConstructor {
@@ -32,10 +33,17 @@ class RequestLineConstructor {
 
         if (!queryParameters.isEmpty()) {
             sb.append("?");
-            for (Map.Entry<String, String> entry : queryParameters.entrySet()) {
-                sb.append(entry.getKey()).
+
+            Iterator it = queryParameters.entrySet().iterator();
+            while (it.hasNext()) {
+                Map.Entry pair = (Map.Entry) it.next();
+                sb.append(pair.getKey()).
                         append("=").
-                        append(entry.getValue());
+                        append(pair.getValue());
+
+                if (it.hasNext()) {
+                    sb.append("&");
+                }
             }
         }
 

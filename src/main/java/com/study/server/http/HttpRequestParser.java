@@ -28,7 +28,7 @@ public class HttpRequestParser implements RequestParser {
         Map<String, String> headers = new HashMap<>();
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
         Pattern methodPattern = Pattern.compile("^[A-Z]+");
-        Pattern pathPattern = Pattern.compile("\\/([a-z\\/\\d.]+)?");
+        Pattern pathPattern = Pattern.compile(" \\/([a-zA-Z\\.\\/]+)?");
         Pattern parametersPattern = Pattern.compile("[a-zA-Z\\d,.]+=[a-zA-Z\\d,.]+");
         Pattern protocolPattern = Pattern.compile("HTTP\\/[\\d].[\\d]");
         Pattern headersPattern = Pattern.compile(".+: .+");
@@ -43,9 +43,15 @@ public class HttpRequestParser implements RequestParser {
 
             matcher = pathPattern.matcher(first);
             matcher.find();
-            String path = matcher.group(0);
+            String path;
 
-            if (path != null) {
+            try {
+                path = matcher.group(0).trim();
+            } catch (Exception e) {
+                path = "";
+            }
+
+            if (!path.equals("")) {
                 if (path.equals("/")) {
                     path = path + "index.html";
                 }
