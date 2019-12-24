@@ -1,5 +1,6 @@
 package com.study.server.http;
 
+import com.study.server.exceptions.BadRequestException;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
@@ -9,16 +10,13 @@ import java.util.HashMap;
 import java.util.Map;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 
-public class HttpRequestParserTest {
-
-    @Test
-    public void testGetParser() {
-    }
+class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should parse InputStream with a GET request and return the correct Request object")
-    public void parseGET() {
+    void parseGET() {
         Request expectedRequest = new Request();
         String method = "GET";
         String path = "/css/style.css";
@@ -103,7 +101,7 @@ public class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should parse InputStream with a PUT request and return the correct Request object")
-    public void parsePUT() {
+    void parsePUT() {
         Request expectedRequest = new Request();
         String method = "PUT";
         String path = "/css/style.css";
@@ -154,7 +152,7 @@ public class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should parse InputStream with a POST request and return the correct Request object")
-    public void parsePOST() {
+    void parsePOST() {
         Request expectedRequest = new Request();
         String method = "POST";
         String path = "/index.html";
@@ -211,9 +209,9 @@ public class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should parse InputStream with a DELETE request and return the correct Request object")
-    public void parseDELETE() {
+    void parseDELETE() {
         Request expectedRequest = new Request();
-        String method = "POST";
+        String method = "DELETE";
         String path = "/index.html";
         Map<String, String> parameters = new HashMap<>();
         String protocol = "HTTP/1.1";
@@ -249,5 +247,51 @@ public class HttpRequestParserTest {
         assertEquals(expectedRequest.getHost(), request.getHost());
         assertEquals(expectedRequest.getHeaders(), request.getHeaders());
         assertEquals(expectedRequest.getBody(), request.getBody());
+    }
+
+    @Test
+    @DisplayName("Should throw an exception BadRequestException, if the request is incorrect")
+    void BadRequestExceptionTest() {
+        String method = "";
+        String path = "/index.html";
+        Map<String, String> parameters = new HashMap<>();
+        String protocol = "HTTP/1.1";
+        String host = "localhost";
+        Map<String, String> headers = new HashMap<>();
+        String body = "\r\n" +
+                "Content-Disposition: form-data; name=\"login\"" + "\r\n" +
+                "\r\n" +
+                "lex" + "\r\n" +
+                "------WebKitFormBoundary7MA4YWxkTrZu0gW--," + "\r\n" +
+                "Content-Disposition: form-data; name=\"login\"" + "\r\n" +
+                "\r\n" +
+                "lex" +
+                "------WebKitFormBoundary7MA4YWxkTrZu0gW--" + "\r\n" +
+                "Content-Disposition: form-data; name=\"password\"" + "\r\n" +
+                "\r\n" +
+                "***&" + "\r\n" +
+                "------WebKitFormBoundary7MA4YWxkTrZu0gW--";
+
+        RequestLineConstructor rlc = new RequestLineConstructor(method, path, parameters,
+                protocol, host, headers, body);
+        String post = rlc.getRequestLine();
+
+        byte[] data1 = post.getBytes();
+        InputStream in1 = new ByteArrayInputStream(data1);
+
+        HttpRequestParser parser = HttpRequestParser.getParser();
+
+        Throwable exception1 = assertThrows(BadRequestException.class, () -> parser.parse(in1));
+        assertEquals("Can't parse request", exception1.getMessage());
+
+        rlc.setMethod("POST");
+        rlc.setPath("/hello");
+        post = rlc.getRequestLine();
+
+        byte[] data2 = post.getBytes();
+        InputStream in2 = new ByteArrayInputStream(data2);
+
+        Throwable exception2 = assertThrows(BadRequestException.class, () -> parser.parse(in2));
+        assertEquals("Can't parse request", exception2.getMessage());
     }
 }

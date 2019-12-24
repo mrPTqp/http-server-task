@@ -3,7 +3,6 @@ package com.study.server.http;
 import com.study.server.exceptions.BadRequestException;
 
 import java.io.BufferedReader;
-import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.util.HashMap;
@@ -100,7 +99,7 @@ public class HttpRequestParser implements RequestParser {
             if (sb.toString().length() > 0 & !method.equals("GET") & !method.equals("DELETE")) {
                 request.setBody(sb.toString().stripTrailing());
             }
-        } catch (IOException e) {
+        } catch (Exception e) {
             throw new BadRequestException("Can't parse request");
         }
         return request;
