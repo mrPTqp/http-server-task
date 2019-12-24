@@ -1,7 +1,7 @@
 package com.study.server.http;
 
-import java.io.IOException;
+import java.io.InputStream;
 
 public interface RequestParser {
-    boolean parse(String inputLine) throws IOException;
+    Request parse(InputStream in);
 }

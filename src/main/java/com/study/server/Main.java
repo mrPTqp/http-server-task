@@ -12,13 +12,13 @@ public class Main {
     private static int defaultNumberOfThreads = 20;
 
     public static void main(String[] args) throws IOException {
-        Map<String, Integer> parametersOfHttpServer;
-        String sourceConfig = System.getenv().get("SitesAndConfigDirectory");
-        parametersOfHttpServer = readProperties(sourceConfig);
+        Map<String, Integer> parameters;
+        String sourceDir = System.getenv().get("SitesAndConfigDirectory");
+        parameters = readProperties(sourceDir);
 
-        if (parametersOfHttpServer != null) {
-            Integer port = parametersOfHttpServer.get("port");
-            Integer numberOfThreads = parametersOfHttpServer.get("numberOfThreads");
+        if (parameters != null) {
+            Integer port = parameters.get("port");
+            Integer numberOfThreads = parameters.get("numberOfThreads");
 
             HttpServerImpl server = new HttpServerImpl(port, numberOfThreads);
             server.start();
@@ -32,17 +32,17 @@ public class Main {
     }
 
     private static HashMap<String, Integer> readProperties(String sourceConfig) throws IOException {
-        HashMap<String, Integer> parametersOfHttpServer = new HashMap<>();
+        HashMap<String, Integer> parameters = new HashMap<>();
         Properties properties = new Properties();
         File file = new File(sourceConfig, "server-config.properties");
 
         if (file.exists()) {
             properties.load(new FileReader(file));
             Integer port = Integer.parseInt(properties.getProperty("port"));
-            parametersOfHttpServer.put("port", port);
+            parameters.put("port", port);
             Integer numberOfThreads = Integer.parseInt(properties.getProperty("numberOfThreads"));
-            parametersOfHttpServer.put("numberOfThreads", numberOfThreads);
-            return parametersOfHttpServer;
+            parameters.put("numberOfThreads", numberOfThreads);
+            return parameters;
         } else {
             return null;
         }
