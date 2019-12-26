@@ -26,26 +26,20 @@ public class HttpRequestParser implements RequestParser {
         Map<String, String> queryParameters = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        Pattern methodPattern = Pattern.compile("^[A-Z]+");
-        Pattern pathPattern = Pattern.compile(" \\/([a-zA-Z\\.\\/]+)?");
-        Pattern parametersPattern = Pattern.compile("[a-zA-Z\\d,.]+=[a-zA-Z\\d,.]+");
-        Pattern protocolPattern = Pattern.compile("HTTP\\/[\\d].[\\d]");
-        Pattern headersPattern = Pattern.compile(".+: .+");
+        Pattern mainString = Pattern.compile("(?<method>[A-Z])+ ((?<path>[a-zA-Z\\.\\/]+)((\\?)?" +
+                "(((?<parameters>[a-zA-Z\\d,.=])+)(&)?)+)?)? (?<protocol>HTTP\\/[\\d].[\\d])");
+        Pattern headersPattern = Pattern.compile("[\\x20-\\x7D&&[^:]]+:( )?[\\x20-\\x7D]+");
         Pattern hostPattern = Pattern.compile("^[\\w\\.-]+");
 
         try {
-            String first = br.readLine();
-            Matcher matcher = methodPattern.matcher(first);
+            String curLine = br.readLine();
+            Matcher matcher = mainString.matcher(curLine);
             matcher.find();
-            String method = matcher.group(0);
-            request.setMethod(method);
-
-            matcher = pathPattern.matcher(first);
-            matcher.find();
+            request.setMethod(matcher.group("method"));
             String path;
 
             try {
-                path = matcher.group(0).trim();
+                path = matcher.group("path");
             } catch (Exception e) {
                 path = "";
             }
@@ -60,6 +54,7 @@ public class HttpRequestParser implements RequestParser {
                 request.setPath(path);
             }
 
+            String parameters = matcher.group("parameters");
             matcher = parametersPattern.matcher(first);
 
             while (matcher.find()) {
@@ -73,7 +68,7 @@ public class HttpRequestParser implements RequestParser {
             String protocol = matcher.group(0);
             request.setProtocol(protocol);
 
-            String curLine = br.readLine();
+            curLine = br.readLine();
             while (!curLine.equals("")) {
                 matcher = headersPattern.matcher(curLine);
                 matcher.find();

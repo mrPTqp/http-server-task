@@ -9,24 +9,24 @@ import java.util.Properties;
 
 public class Main {
     private static int defaultPort = 3333;
-    private static int defaultNumberOfThreads = 20;
+    private static int defaultPoolSize = 20;
 
     public static void main(String[] args) throws IOException {
         Map<String, Integer> parameters;
-        String sourceDir = System.getenv().get("SitesAndConfigDirectory");
+        String sourceDir = System.getenv().get("CONF_DIR");
         parameters = readProperties(sourceDir);
 
         if (parameters != null) {
-            Integer port = parameters.get("port");
-            Integer numberOfThreads = parameters.get("numberOfThreads");
+            Integer port = parameters.get("server.port");
+            Integer poolSize = parameters.get("server.pool-size");
 
-            HttpServerImpl server = new HttpServerImpl(port, numberOfThreads);
+            HttpServerImpl server = new HttpServerImpl(port, poolSize);
             server.start();
         } else {
             int port = defaultPort;
-            int numberOfThreads = defaultNumberOfThreads;
+            int poolSize = defaultPoolSize;
 
-            HttpServerImpl server = new HttpServerImpl(port, numberOfThreads);
+            HttpServerImpl server = new HttpServerImpl(port, poolSize);
             server.start();
         }
     }
@@ -38,10 +38,10 @@ public class Main {
 
         if (file.exists()) {
             properties.load(new FileReader(file));
-            Integer port = Integer.parseInt(properties.getProperty("port"));
+            Integer port = Integer.parseInt(properties.getProperty("server.port"));
             parameters.put("port", port);
-            Integer numberOfThreads = Integer.parseInt(properties.getProperty("numberOfThreads"));
-            parameters.put("numberOfThreads", numberOfThreads);
+            Integer poolSize = Integer.parseInt(properties.getProperty("server.pool-size"));
+            parameters.put("poolSize", poolSize);
             return parameters;
         } else {
             return null;
