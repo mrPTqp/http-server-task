@@ -9,6 +9,7 @@ public class Request {
     private Map<String, String> queryParameters = new HashMap<>();
     private String protocol;
     private String host;
+    private String port;
     private Map<String, String> headers = new HashMap<>();
     private String body;
 
@@ -43,6 +44,10 @@ public class Request {
         return queryParameters;
     }
 
+    public String getPort() {
+        return port;
+    }
+
     public void setMethod(String method) {
         this.method = method;
     }
@@ -69,5 +74,9 @@ public class Request {
 
     public void setQueryParameters(Map<String, String> queryParameters) {
         this.queryParameters = queryParameters;
+    }
+
+    public void setPort(String port) {
+        this.port = port;
     }
 }

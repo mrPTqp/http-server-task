@@ -26,21 +26,22 @@ public class HttpRequestParser implements RequestParser {
         Map<String, String> queryParameters = new HashMap<>();
         Map<String, String> headers = new HashMap<>();
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        Pattern mainString = Pattern.compile("(?<method>[A-Z])+ ((?<path>[a-zA-Z\\.\\/]+)((\\?)?" +
-                "(((?<parameters>[a-zA-Z\\d,.=])+)(&)?)+)?)? (?<protocol>HTTP\\/[\\d].[\\d])");
-        Pattern headersPattern = Pattern.compile("[\\x20-\\x7D&&[^:]]+:( )?[\\x20-\\x7D]+");
-        Pattern hostPattern = Pattern.compile("^[\\w\\.-]+");
+        Pattern mainString = Pattern.compile("(?<method>[A-Z]+)( )((?<path>[a-zA-Z./]+)((\\?)(?<parameters>[a-zA-Z\\d,.=&]+))?)? (?<protocol>HTTP/[\\d].[\\d])");
+        Pattern pairsPattern = Pattern.compile("(?<key>[a-zA-Z\\d]+)=(?<value>[a-zA-Z\\d]+)");
+        Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+):( )?(?<value>[\\x20-\\x7D]+)");
+        Pattern hostPattern = Pattern.compile("(?<host>[\\x20-\\x7D&&[^:]]+)(:)?(?<port>\\d+)?");
 
         try {
             String curLine = br.readLine();
             Matcher matcher = mainString.matcher(curLine);
             matcher.find();
-            request.setMethod(matcher.group("method"));
+            String method = matcher.group("method");
+            request.setMethod(method);
             String path;
 
-            try {
+            if (curLine.contains(" /")) {
                 path = matcher.group("path");
-            } catch (Exception e) {
+            } else {
                 path = "";
             }
 
@@ -54,35 +55,44 @@ public class HttpRequestParser implements RequestParser {
                 request.setPath(path);
             }
 
-            String parameters = matcher.group("parameters");
-            matcher = parametersPattern.matcher(first);
+            if (curLine.contains("?")) {
+                String parameters = matcher.group("parameters");
+                Matcher pairsMatcher = pairsPattern.matcher(parameters);
 
-            while (matcher.find()) {
-                String[] partsOfParameters = matcher.group().split("=");
-                queryParameters.put(partsOfParameters[0], partsOfParameters[1]);
+                while (pairsMatcher.find()) {
+                    String key = pairsMatcher.group("key").toLowerCase();
+                    String value = pairsMatcher.group("value").toLowerCase();
+                    queryParameters.put(key, value);
+                }
+                request.setQueryParameters(queryParameters);
             }
-            request.setQueryParameters(queryParameters);
 
-            matcher = protocolPattern.matcher(first);
-            matcher.find();
-            String protocol = matcher.group(0);
+            String protocol = matcher.group("protocol");
             request.setProtocol(protocol);
 
             curLine = br.readLine();
             while (!curLine.equals("")) {
                 matcher = headersPattern.matcher(curLine);
                 matcher.find();
-                String[] partsOfHeaders = matcher.group().split(": ");
-                headers.put(partsOfHeaders[0], partsOfHeaders[1]);
+                String key = matcher.group("key").toLowerCase();
+                String value = matcher.group("value").toLowerCase();
+                headers.put(key, value);
                 curLine = br.readLine();
             }
             request.setHeaders(headers);
 
-            String nonFormattedHost = headers.get("Host");
-            matcher = hostPattern.matcher(nonFormattedHost);
+            String hostLine = headers.get("host");
+            matcher = hostPattern.matcher(hostLine);
             matcher.find();
-            String host = matcher.group(0).toLowerCase();
+            String host = matcher.group("host");
+            String port;
+            try {
+                port = matcher.group("port");
+            } catch (Exception e) {
+                port = "80";
+            }
             request.setHost(host);
+            request.setPort(port);
 
             curLine = br.readLine();
             StringBuilder sb = new StringBuilder();

@@ -23,7 +23,8 @@ class HttpRequestParserTest {
         Map<String, String> parameters = new HashMap<>();
         String protocol = "HTTP/1.1";
         String host = "food.com";
-        Map<String, String> headers = new HashMap<>();
+        Map<String, String> headers1 = new HashMap<>();
+        Map<String, String> headers2 = new HashMap<>();
         String body = "";
 
         expectedRequest.setMethod(method);
@@ -36,13 +37,17 @@ class HttpRequestParserTest {
         expectedRequest.setProtocol(protocol);
         expectedRequest.setHost(host);
 
-        headers.put("Host", "FOOD.com");
-        headers.put("Accept", "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*");
-        headers.put("Accept-Language", "ru");
-        expectedRequest.setHeaders(headers);
+        headers1.put("Host", "FOOD.com");
+        headers1.put("Accept", "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*");
+        headers1.put("Accept-Language", "ru");
+
+        headers2.put("Host".toLowerCase(), "FOOD.com".toLowerCase());
+        headers2.put("Accept".toLowerCase(), "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*".toLowerCase());
+        headers2.put("Accept-Language".toLowerCase(), "ru".toLowerCase());
+        expectedRequest.setHeaders(headers2);
 
         RequestLineConstructor rlc = new RequestLineConstructor(method, path, parameters,
-                protocol, host, headers, body);
+                protocol, host, headers1, body);
         String get1 = rlc.getRequestLine();
 
         byte[] data1 = get1.getBytes();
@@ -61,8 +66,10 @@ class HttpRequestParserTest {
 
 
         expectedRequest.setPath("/index.html");
-        expectedRequest.getHeaders().put("Host", "food.com");
+        expectedRequest.getHeaders().put("host", "food.com");
         rlc.setPath("/");
+        Map<String, String> mock = new HashMap<>();
+        rlc.setQueryParameters(mock);
         String get2 = rlc.getRequestLine();
 
         byte[] data2 = get2.getBytes();
@@ -75,7 +82,7 @@ class HttpRequestParserTest {
         assertEquals(expectedRequest.getHost(), request.getHost());
 
         expectedRequest.setPath("/index.html");
-        expectedRequest.getHeaders().put("Host", "food.com");
+        expectedRequest.getHeaders().put("host", "food.com");
         rlc.setPath("");
         String get3 = rlc.getRequestLine();
 
@@ -108,7 +115,8 @@ class HttpRequestParserTest {
         Map<String, String> parameters = new HashMap<>();
         String protocol = "HTTP/1.1";
         String host = "food.com";
-        Map<String, String> headers = new HashMap<>();
+        Map<String, String> headers1 = new HashMap<>();
+        Map<String, String> headers2 = new HashMap<>();
         String body = "";
 
         expectedRequest.setMethod(method);
@@ -116,12 +124,18 @@ class HttpRequestParserTest {
         expectedRequest.setProtocol(protocol);
         expectedRequest.setHost(host);
 
-        headers.put("Authorization", "Bearer mt0dgHmLJMVQhvjpNXDyA83vA_PxH23Y");
-        headers.put("Accept", "application/json");
-        headers.put("Content-Type", "application/json");
-        headers.put("Content-Length", "85");
-        headers.put("Host", "food.com");
-        expectedRequest.setHeaders(headers);
+        headers1.put("Authorization", "Bearer mt0dgHmLJMVQhvjpNXDyA83vA_PxH23Y");
+        headers1.put("Accept", "application/json");
+        headers1.put("Content-Type", "application/json");
+        headers1.put("Content-Length", "85");
+        headers1.put("Host", "food.com");
+
+        headers2.put("Authorization".toLowerCase(), "Bearer mt0dgHmLJMVQhvjpNXDyA83vA_PxH23Y".toLowerCase());
+        headers2.put("Accept".toLowerCase(), "application/json".toLowerCase());
+        headers2.put("Content-Type".toLowerCase(), "application/json".toLowerCase());
+        headers2.put("Content-Length".toLowerCase(), "85".toLowerCase());
+        headers2.put("Host".toLowerCase(), "food.com".toLowerCase());
+        expectedRequest.setHeaders(headers2);
 
         body = "{" + "\r\n" +
                 "\"Id\": 12345," + "\r\n" +
@@ -132,7 +146,7 @@ class HttpRequestParserTest {
         expectedRequest.setBody(body);
 
         RequestLineConstructor rlc = new RequestLineConstructor(method, path, parameters,
-                protocol, host, headers, body);
+                protocol, host, headers1, body);
         String put = rlc.getRequestLine();
 
         byte[] data = put.getBytes();
@@ -159,7 +173,8 @@ class HttpRequestParserTest {
         Map<String, String> parameters = new HashMap<>();
         String protocol = "HTTP/1.1";
         String host = "localhost";
-        Map<String, String> headers = new HashMap<>();
+        Map<String, String> headers1 = new HashMap<>();
+        Map<String, String> headers2 = new HashMap<>();
         String body = "";
 
         expectedRequest.setMethod(method);
@@ -167,11 +182,16 @@ class HttpRequestParserTest {
         expectedRequest.setProtocol(protocol);
         expectedRequest.setHost(host);
 
-        headers.put("Host", "localhost:8080");
-        headers.put("Cache-Control", "no-cache");
-        headers.put("Postman-Token", "8f2fd50e-ca2f-454e-9ef9-254590e10236");
-        headers.put("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW");
-        expectedRequest.setHeaders(headers);
+        headers1.put("Host", "localhost:8080");
+        headers1.put("Cache-Control", "no-cache");
+        headers1.put("Postman-Token", "8f2fd50e-ca2f-454e-9ef9-254590e10236");
+        headers1.put("Content-Type", "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW");
+
+        headers2.put("Host".toLowerCase(), "localhost:8080".toLowerCase());
+        headers2.put("Cache-Control".toLowerCase(), "no-cache".toLowerCase());
+        headers2.put("Postman-Token".toLowerCase(), "8f2fd50e-ca2f-454e-9ef9-254590e10236".toLowerCase());
+        headers2.put("Content-Type".toLowerCase(), "multipart/form-data; boundary=----WebKitFormBoundary7MA4YWxkTrZu0gW".toLowerCase());
+        expectedRequest.setHeaders(headers2);
 
         body = "\r\n" +
                 "Content-Disposition: form-data; name=\"login\"" + "\r\n" +
@@ -189,7 +209,7 @@ class HttpRequestParserTest {
         expectedRequest.setBody(body);
 
         RequestLineConstructor rlc = new RequestLineConstructor(method, path, parameters,
-                protocol, host, headers, body);
+                protocol, host, headers1, body);
         String post = rlc.getRequestLine();
 
         byte[] data = post.getBytes();
@@ -216,7 +236,8 @@ class HttpRequestParserTest {
         Map<String, String> parameters = new HashMap<>();
         String protocol = "HTTP/1.1";
         String host = "localhost";
-        Map<String, String> headers = new HashMap<>();
+        Map<String, String> headers1 = new HashMap<>();
+        Map<String, String> headers2 = new HashMap<>();
         String body = "";
 
         expectedRequest.setMethod(method);
@@ -224,14 +245,19 @@ class HttpRequestParserTest {
         expectedRequest.setProtocol(protocol);
         expectedRequest.setHost(host);
 
-        headers.put("Host", "localhost:8080");
-        headers.put("Accept", "application/json");
-        headers.put("Content-Type", "application/json");
-        headers.put("Content-Length", "19");
-        expectedRequest.setHeaders(headers);
+        headers1.put("Host", "localhost:8080");
+        headers1.put("Accept", "application/json");
+        headers1.put("Content-Type", "application/json");
+        headers1.put("Content-Length", "19");
+
+        headers2.put("Host".toLowerCase(), "localhost:8080".toLowerCase());
+        headers2.put("Accept".toLowerCase(), "application/json".toLowerCase());
+        headers2.put("Content-Type".toLowerCase(), "application/json".toLowerCase());
+        headers2.put("Content-Length".toLowerCase(), "19".toLowerCase());
+        expectedRequest.setHeaders(headers2);
 
         RequestLineConstructor rlc = new RequestLineConstructor(method, path, parameters,
-                protocol, host, headers, body);
+                protocol, host, headers1, body);
         String delete = rlc.getRequestLine();
 
         byte[] data = delete.getBytes();
