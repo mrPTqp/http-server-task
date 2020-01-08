@@ -10,103 +10,131 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HttpRequestParser implements RequestParser {
-    private static HttpRequestParser parser = new HttpRequestParser();
+public class HttpRequestParser {
+    private static final HttpRequestParser parser = new HttpRequestParser();
+    private static Pattern mainString = Pattern.compile("(?<method>[A-Z]+)( )((?<path>[a-zA-Z./]+)" +
+            "((\\?)(?<parameters>[a-zA-Z\\d,.=&]+))?)? (?<protocol>HTTP/[\\d].[\\d])");
+    private static Pattern pairsPattern = Pattern.compile("(?<key>[a-zA-Z\\d]+)=(?<value>[a-zA-Z\\d]+)");
+    private static Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+)" +
+            ":( )?(?<value>[\\x20-\\x7D]+)");
+    private static Pattern hostPattern = Pattern.compile("(?<host>[\\x20-\\x7D&&[^:]]+)(:)?(?<port>\\d+)?");
 
     private HttpRequestParser() {
     }
 
-    public static HttpRequestParser getParser() {
-        return parser;
-    }
-
-    @Override
-    public Request parse(InputStream in) {
-        Request request = new Request();
-        Map<String, String> queryParameters = new HashMap<>();
-        Map<String, String> headers = new HashMap<>();
+    public static HttpRequest parse(InputStream in) {
         BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        Pattern mainString = Pattern.compile("(?<method>[A-Z]+)( )((?<path>[a-zA-Z./]+)((\\?)(?<parameters>[a-zA-Z\\d,.=&]+))?)? (?<protocol>HTTP/[\\d].[\\d])");
-        Pattern pairsPattern = Pattern.compile("(?<key>[a-zA-Z\\d]+)=(?<value>[a-zA-Z\\d]+)");
-        Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+):( )?(?<value>[\\x20-\\x7D]+)");
-        Pattern hostPattern = Pattern.compile("(?<host>[\\x20-\\x7D&&[^:]]+)(:)?(?<port>\\d+)?");
+        HttpRequest.Builder builder = new HttpRequest.Builder();
 
         try {
             String curLine = br.readLine();
             Matcher matcher = mainString.matcher(curLine);
-            matcher.find();
-            String method = matcher.group("method");
-            request.setMethod(method);
-            String path;
 
-            if (curLine.contains(" /")) {
-                path = matcher.group("path");
-            } else {
-                path = "";
-            }
+            String method = methodParse(matcher);
+            builder.setMethod(method);
 
-            if (!path.equals("")) {
-                if (path.equals("/")) {
-                    path = path + "index.html";
-                }
-                request.setPath(path);
-            } else {
-                path = "/index.html";
-                request.setPath(path);
-            }
+            String path = pathParse(curLine, matcher);
+            builder.setPath(path);
 
+            Map<String, String> queryParameters;
             if (curLine.contains("?")) {
-                String parameters = matcher.group("parameters");
-                Matcher pairsMatcher = pairsPattern.matcher(parameters);
-
-                while (pairsMatcher.find()) {
-                    String key = pairsMatcher.group("key").toLowerCase();
-                    String value = pairsMatcher.group("value").toLowerCase();
-                    queryParameters.put(key, value);
-                }
-                request.setQueryParameters(queryParameters);
+                queryParameters = queryParse(matcher);
+                builder.setQueryParameters(queryParameters);
             }
 
-            String protocol = matcher.group("protocol");
-            request.setProtocol(protocol);
+            String protocol = protocolParse(matcher);
+            builder.setProtocol(protocol); // TODO: 08.01.2020 использовать только HTTP/1.1
 
             curLine = br.readLine();
+            Map<String, String> headers = new HashMap<>();
             while (!curLine.equals("")) {
-                matcher = headersPattern.matcher(curLine);
-                matcher.find();
-                String key = matcher.group("key").toLowerCase();
-                String value = matcher.group("value").toLowerCase();
-                headers.put(key, value);
+                String[] pair = headersParse(curLine);
+                headers.put(pair[0], pair[1]);
                 curLine = br.readLine();
             }
-            request.setHeaders(headers);
+            builder.setHeaders(headers);
 
-            String hostLine = headers.get("host");
-            matcher = hostPattern.matcher(hostLine);
-            matcher.find();
-            String host = matcher.group("host");
-            String port;
-            try {
-                port = matcher.group("port");
-            } catch (Exception e) {
-                port = "80";
-            }
-            request.setHost(host);
-            request.setPort(port);
+            String host = hostParse(headers);
+            builder.setHost(host);
 
-            curLine = br.readLine();
-            StringBuilder sb = new StringBuilder();
-            while (curLine != null) {
-                sb.append(curLine).append("\r\n");
-                curLine = br.readLine();
-            }
-
-            if (sb.toString().length() > 0 & !method.equals("GET") & !method.equals("DELETE")) {
-                request.setBody(sb.toString().stripTrailing());
-            }
+            String port = portParse(headers);
+            builder.setPort(port);
         } catch (Exception e) {
             throw new BadRequestException("Can't parse request");
         }
-        return request;
+        return builder.build();
+    }
+
+    private static String methodParse(Matcher matcher) {
+        matcher.find();
+        String method = matcher.group("method");
+
+        return method;
+    }
+
+    private static String pathParse(String curLine, Matcher matcher) {
+        String path;
+
+        if (curLine.contains(" /")) {
+            path = matcher.group("path");
+        } else {
+            path = "";
+        }
+
+        return path;
+    }
+
+    private static Map<String, String> queryParse(Matcher matcher) {
+        Map<String, String> queryParameters = new HashMap<>();
+        String parameters = matcher.group("parameters");
+        Matcher pairsMatcher = pairsPattern.matcher(parameters);
+
+        while (pairsMatcher.find()) {
+            String key = pairsMatcher.group("key").toLowerCase();
+            String value = pairsMatcher.group("value").toLowerCase();
+            queryParameters.put(key, value);
+        }
+
+        return queryParameters;
+    }
+
+    private static String protocolParse(Matcher matcher) {
+        String protocol = matcher.group("protocol");
+
+        return protocol;
+    }
+
+    private static String[] headersParse(String curLine) {
+        Matcher matcher = headersPattern.matcher(curLine);
+        String[] headers = new String[2];
+        matcher.find();
+        headers[0] = matcher.group("key").toLowerCase();
+        headers[1] = matcher.group("value").toLowerCase();
+
+        return headers;
+    }
+
+    private static String hostParse(Map<String, String> headers) {
+        String hostLine = headers.get("host");
+        Matcher matcher = hostPattern.matcher(hostLine);
+        matcher.find();
+        String host = matcher.group("host");
+
+        return host;
+    }
+
+    private static String portParse(Map<String, String> headers) {
+        String hostLine = headers.get("host");
+        Matcher matcher = hostPattern.matcher(hostLine);
+        matcher.find();
+        String port;
+
+        if (matcher.group("port") == null) {
+            port = "80";
+        } else {
+            port = matcher.group("port");
+        }
+
+        return port;
     }
 }

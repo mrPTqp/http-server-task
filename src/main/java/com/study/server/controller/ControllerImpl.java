@@ -1,6 +1,6 @@
 package com.study.server.controller;
 
-import com.study.server.http.Request;
+import com.study.server.http.HttpRequest;
 import com.study.server.http.Response;
 import com.study.server.http.StatusCode;
 
@@ -18,7 +18,7 @@ public class ControllerImpl implements Controller {
     }
 
     @Override
-    public boolean match(Request request) {
+    public boolean match(HttpRequest request) {
         String host = request.getHost();
 
         for (String path : indexHtmlFilesPaths) {
@@ -32,7 +32,7 @@ public class ControllerImpl implements Controller {
     }
 
     @Override
-    public Response handle(Request request) {
+    public Response handle(HttpRequest request) {
         Response response = new Response();
         StringBuffer buf = new StringBuffer();
 
