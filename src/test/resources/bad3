@@ -1,0 +1,6 @@
+GET /index.html HTTP/0.9
+Host: localhost:8080
+Accept: application/json
+Content-Type: application/json
+Content-Length: 19
+

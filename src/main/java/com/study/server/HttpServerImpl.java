@@ -8,15 +8,15 @@ import java.util.concurrent.Executors;
 
 public class HttpServerImpl implements HttpServer {
     private int port;
-    private int numberOfThreads;
+    private int poolSize;
     private boolean isStopped = false;
     private ServerSocket serverSocket = null;
     private ExecutorService executor;
 
-    public HttpServerImpl(int port, int numberOfThreads) {
+    public HttpServerImpl(int port, int poolSize) {
         this.port = port;
-        this.numberOfThreads = numberOfThreads;
-        this.executor = Executors.newFixedThreadPool(numberOfThreads);
+        this.poolSize = poolSize;
+        this.executor = Executors.newFixedThreadPool(poolSize);
     }
 
     @Override

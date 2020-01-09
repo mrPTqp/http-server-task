@@ -10,98 +10,144 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class HttpRequestParser implements RequestParser {
-    private static HttpRequestParser parser = new HttpRequestParser();
+public class HttpRequestParser {
+    private static Pattern mainString = Pattern.compile("(?<method>[\\x41-\\x5A]+)( )" +
+            "((?<path>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[./]]]]+)" +
+            "((\\?)(?<parameters>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[,.=&]]]]+))?)? (?<protocol>HTTP/[\\d].[\\d])");
+    private static Pattern pairsPattern = Pattern.compile("(?<key>[a-zA-Z\\d]+)=(?<value>[a-zA-Z\\d]+)");
+    private static Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+)" +
+            ":(?<value>[\\x20-\\x7D]+)");
+    private static Pattern hostPattern = Pattern.compile("(?<host>[\\x20-\\x7D&&[^:]]+)(:)?(?<port>\\d+)?");
 
     private HttpRequestParser() {
     }
 
-    public static HttpRequestParser getParser() {
-        return parser;
-    }
-
-    @Override
-    public Request parse(InputStream in) {
-        Request request = new Request();
-        Map<String, String> queryParameters = new HashMap<>();
-        Map<String, String> headers = new HashMap<>();
-        BufferedReader br = new BufferedReader(new InputStreamReader(in));
-        Pattern methodPattern = Pattern.compile("^[A-Z]+");
-        Pattern pathPattern = Pattern.compile(" \\/([a-zA-Z\\.\\/]+)?");
-        Pattern parametersPattern = Pattern.compile("[a-zA-Z\\d,.]+=[a-zA-Z\\d,.]+");
-        Pattern protocolPattern = Pattern.compile("HTTP\\/[\\d].[\\d]");
-        Pattern headersPattern = Pattern.compile(".+: .+");
-        Pattern hostPattern = Pattern.compile("^[\\w\\.-]+");
+    public static HttpRequest parse(InputStream in) {
+        var br = new BufferedReader(new InputStreamReader(in));
+        var builder = new HttpRequest.Builder();
 
         try {
-            String first = br.readLine();
-            Matcher matcher = methodPattern.matcher(first);
-            matcher.find();
-            String method = matcher.group(0);
-            request.setMethod(method);
+            var curLine = br.readLine();
+            var matcher = mainString.matcher(curLine);
 
-            matcher = pathPattern.matcher(first);
-            matcher.find();
-            String path;
+            var method = methodParse(matcher);
+            builder.setMethod(method);
 
-            try {
-                path = matcher.group(0).trim();
-            } catch (Exception e) {
-                path = "";
+            var path = pathParse(curLine, matcher);
+            builder.setPath(path);
+
+            Map<String, String> queryParameters;
+            if (curLine.contains("?")) {
+                queryParameters = queryParse(matcher);
+                builder.setQueryParameters(queryParameters);
             }
 
-            if (!path.equals("")) {
-                if (path.equals("/")) {
-                    path = path + "index.html";
-                }
-                request.setPath(path);
-            } else {
-                path = "/index.html";
-                request.setPath(path);
-            }
-
-            matcher = parametersPattern.matcher(first);
-
-            while (matcher.find()) {
-                String[] partsOfParameters = matcher.group().split("=");
-                queryParameters.put(partsOfParameters[0], partsOfParameters[1]);
-            }
-            request.setQueryParameters(queryParameters);
-
-            matcher = protocolPattern.matcher(first);
-            matcher.find();
-            String protocol = matcher.group(0);
-            request.setProtocol(protocol);
-
-            String curLine = br.readLine();
-            while (!curLine.equals("")) {
-                matcher = headersPattern.matcher(curLine);
-                matcher.find();
-                String[] partsOfHeaders = matcher.group().split(": ");
-                headers.put(partsOfHeaders[0], partsOfHeaders[1]);
-                curLine = br.readLine();
-            }
-            request.setHeaders(headers);
-
-            String nonFormattedHost = headers.get("Host");
-            matcher = hostPattern.matcher(nonFormattedHost);
-            matcher.find();
-            String host = matcher.group(0).toLowerCase();
-            request.setHost(host);
+            var protocol = protocolParse(matcher);
+            builder.setProtocol(protocol);
 
             curLine = br.readLine();
-            StringBuilder sb = new StringBuilder();
-            while (curLine != null) {
-                sb.append(curLine).append("\r\n");
+            Map<String, String> headers = new HashMap<>();
+            while (!curLine.equals("")) {
+                String[] pair = headersParse(curLine);
+                headers.put(pair[0], pair[1]);
                 curLine = br.readLine();
             }
+            builder.setHeaders(headers);
 
-            if (sb.toString().length() > 0 & !method.equals("GET") & !method.equals("DELETE")) {
-                request.setBody(sb.toString().stripTrailing());
-            }
+            var host = hostParse(headers);
+            builder.setHost(host);
+
+            var port = portParse(headers);
+            builder.setPort(port);
         } catch (Exception e) {
             throw new BadRequestException("Can't parse request");
         }
-        return request;
+        return builder.build();
+    }
+
+    private static String methodParse(Matcher matcher) {
+        matcher.find();
+        var method = matcher.group("method");
+        var methodIsSupported = false;
+
+        for (HttpMethods elem : HttpMethods.values()) {
+            if (elem.name().equals(method)) {
+                methodIsSupported = true;
+                break;
+            }
+        }
+
+        if (methodIsSupported) {
+            return method;
+        } else {
+            throw new BadRequestException("Can't parse request");
+        }
+    }
+
+    private static String pathParse(String curLine, Matcher matcher) {
+
+        if (curLine.contains(" /")) {
+            return matcher.group("path");
+        } else {
+            return "";
+        }
+    }
+
+    private static Map<String, String> queryParse(Matcher matcher) {
+        Map<String, String> queryParameters = new HashMap<>();
+        var parameters = matcher.group("parameters");
+        Matcher pairsMatcher = pairsPattern.matcher(parameters);
+
+        while (pairsMatcher.find()) {
+            var key = pairsMatcher.group("key").toLowerCase();
+            var value = pairsMatcher.group("value").toLowerCase();
+            queryParameters.put(key, value);
+        }
+
+        return queryParameters;
+    }
+
+    private static String protocolParse(Matcher matcher) {
+        var defaultProtocol = "HTTP/1.1";
+        var protocol = matcher.group("protocol");
+        if (defaultProtocol.equals(protocol)) {
+            return protocol;
+        } else {
+            throw new BadRequestException("Can't parse request");
+        }
+    }
+
+    private static String[] headersParse(String curLine) {
+        var matcher = headersPattern.matcher(curLine);
+        var headers = new String[2];
+        matcher.find();
+        headers[0] = matcher.group("key").toLowerCase();
+        headers[1] = matcher.group("value").trim().toLowerCase();
+
+        if (headers[0].equals("") || headers[1].equals("")) {
+            throw new BadRequestException("Can't parse request");
+        } else {
+            return headers;
+        }
+    }
+
+    private static String hostParse(Map<String, String> headers) {
+        var hostLine = headers.get("host");
+        var matcher = hostPattern.matcher(hostLine);
+        matcher.find();
+
+        return matcher.group("host");
+    }
+
+    private static String portParse(Map<String, String> headers) {
+        var hostLine = headers.get("host");
+        var matcher = hostPattern.matcher(hostLine);
+        matcher.find();
+
+        if (matcher.group("port") == null) {
+            return "80";
+        } else {
+            return matcher.group("port");
+        }
     }
 }
