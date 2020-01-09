@@ -6,7 +6,6 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
-import java.io.InputStream;
 
 import static com.study.server.utils.TestUtils.readFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -17,12 +16,12 @@ class HttpRequestParserTest {
     @Test
     @DisplayName("Should parse GET request case-insensitive headers")
     void parseGET() {
-        HttpRequest expectedRequest = HttpRequestGenerator.createGetRequest();
+        var expectedRequest = HttpRequestGenerator.createGetRequest();
 
         try {
-            InputStream is = readFile("GET");
-            BufferedInputStream bis = new BufferedInputStream(is);
-            HttpRequest request = HttpRequestParser.parse(bis);
+            var is = readFile("GET");
+            var bis = new BufferedInputStream(is);
+            var request = HttpRequestParser.parse(bis);
 
             assertEquals(expectedRequest, request);
 
@@ -34,12 +33,12 @@ class HttpRequestParserTest {
     @Test
     @DisplayName("Should parse PUT request without path")
     void parsePUT() {
-        HttpRequest expectedRequest = HttpRequestGenerator.createPutRequest();
+        var expectedRequest = HttpRequestGenerator.createPutRequest();
 
         try {
-            InputStream is = readFile("PUT");
-            BufferedInputStream bis = new BufferedInputStream(is);
-            HttpRequest request = HttpRequestParser.parse(bis);
+            var is = readFile("PUT");
+            var bis = new BufferedInputStream(is);
+            var request = HttpRequestParser.parse(bis);
 
             assertEquals(expectedRequest, request);
 
@@ -49,14 +48,14 @@ class HttpRequestParserTest {
     }
 
     @Test
-    @DisplayName("Should parse InputStream with a POST request and return the correct Request object")
+    @DisplayName("Should parse POST request with Host header only")
     void parsePOST() {
-        HttpRequest expectedRequest = HttpRequestGenerator.createPostRequest();
+        var expectedRequest = HttpRequestGenerator.createPostRequest();
 
         try {
-            InputStream is = readFile("POST");
-            BufferedInputStream bis = new BufferedInputStream(is);
-            HttpRequest request = HttpRequestParser.parse(bis);
+            var is = readFile("POST");
+            var bis = new BufferedInputStream(is);
+            var request = HttpRequestParser.parse(bis);
 
             assertEquals(expectedRequest, request);
 
@@ -66,14 +65,14 @@ class HttpRequestParserTest {
     }
 
     @Test
-    @DisplayName("Should parse InputStream with a DELETE request and return the correct Request object")
+    @DisplayName("Should DELETE request in which header Host is not in the first place")
     void parseDELETE() {
-        HttpRequest expectedRequest = HttpRequestGenerator.createDeleteRequest();
+        var expectedRequest = HttpRequestGenerator.createDeleteRequest();
 
         try {
-            InputStream is = readFile("DELETE");
-            BufferedInputStream bis = new BufferedInputStream(is);
-            HttpRequest request = HttpRequestParser.parse(bis);
+            var is = readFile("DELETE");
+            var bis = new BufferedInputStream(is);
+            var request = HttpRequestParser.parse(bis);
 
             assertEquals(expectedRequest, request);
 
@@ -83,18 +82,100 @@ class HttpRequestParserTest {
     }
 
     @Test
-    @DisplayName("Should throw an exception BadRequestException, if the request is incorrect")
-    void BadRequestExceptionTest() {
+    @DisplayName("Should throw BadRequestException, if the method is absent")
+    void BadRequestExceptionTest1() {
 
         try {
-            InputStream is = readFile("bad");
-            BufferedInputStream bis = new BufferedInputStream(is);
+            var is = readFile("bad1");
+            var bis = new BufferedInputStream(is);
 
-            Throwable exception1 = assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
-            assertEquals("Can't parse request", exception1.getMessage());
+            Throwable exception = assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+            assertEquals("Can't parse request", exception.getMessage());
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
+
+    @Test
+    @DisplayName("Should throw BadRequestException, if the method is incorrect or not supported")
+    void BadRequestExceptionTest2() {
+
+        try {
+            var is = readFile("bad2");
+            var bis = new BufferedInputStream(is);
+
+            Throwable exception = assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+            assertEquals("Can't parse request", exception.getMessage());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    @DisplayName("Should throw BadRequestException, if the version of HTTP protocol difference by HTTP/1.1")
+    void BadRequestExceptionTest3() {
+
+        try {
+            var is = readFile("bad3");
+            var bis = new BufferedInputStream(is);
+
+            Throwable exception = assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+            assertEquals("Can't parse request", exception.getMessage());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    @DisplayName("Should throw BadRequestException, if the path contain non-ASCII symbols")
+    void BadRequestExceptionTest4() {
+
+        try {
+            var is = readFile("bad4");
+            var bis = new BufferedInputStream(is);
+
+            Throwable exception = assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+            assertEquals("Can't parse request", exception.getMessage());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    @DisplayName("Should throw BadRequestException, if the headers contain non-ASCII symbols")
+    void BadRequestExceptionTest5() {
+
+        try {
+            var is = readFile("bad5");
+            var bis = new BufferedInputStream(is);
+
+            Throwable exception = assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+            assertEquals("Can't parse request", exception.getMessage());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    @Test
+    @DisplayName("Should throw BadRequestException, if the Host header absent")
+    void BadRequestExceptionTest6() {
+
+        try {
+            var is = readFile("bad6");
+            var bis = new BufferedInputStream(is);
+
+            Throwable exception = assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+            assertEquals("Can't parse request", exception.getMessage());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
 }

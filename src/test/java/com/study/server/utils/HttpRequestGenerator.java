@@ -78,9 +78,7 @@ public class HttpRequestGenerator {
         var host = "localhost";
         var port = "8080";
         var headers = Map.of(
-                "Host".toLowerCase(), "localhost:8080".toLowerCase(),
-                "Accept".toLowerCase(), "image/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*".toLowerCase(),
-                "Accept-Language".toLowerCase(), "ru".toLowerCase()
+                "Host".toLowerCase(), "localhost:8080".toLowerCase()
         );
 
         return prepareRequest(
