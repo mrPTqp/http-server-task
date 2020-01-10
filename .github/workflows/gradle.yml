@@ -14,4 +14,4 @@ jobs:
       with:
         java-version: 11
     - name: Test with Gradle
-      run: ./gradlew test
+      run: ./gradlew test --no-daemon
