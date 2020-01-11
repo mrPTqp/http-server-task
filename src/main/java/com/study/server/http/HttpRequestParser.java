@@ -13,10 +13,11 @@ import java.util.regex.Pattern;
 public class HttpRequestParser {
     private static Pattern mainString = Pattern.compile("(?<method>[\\x41-\\x5A]+)( )" +
             "((?<path>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[./]]]]+)" +
-            "((\\?)(?<parameters>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[,.=&]]]]+))?)? (?<protocol>HTTP/[\\d].[\\d])");
+            "((\\?)(?<parameters>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[,.=&]]]]+))?)? " +
+            "(?<protocol>HTTP/[\\d].[\\d])"
+    );
     private static Pattern pairsPattern = Pattern.compile("(?<key>[a-zA-Z\\d]+)=(?<value>[a-zA-Z\\d]+)");
-    private static Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+)" +
-            ":(?<value>[\\x20-\\x7D]+)");
+    private static Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+):(?<value>[\\x20-\\x7D]+)");
     private static Pattern hostPattern = Pattern.compile("(?<host>[\\x20-\\x7D&&[^:]]+)(:)?(?<port>\\d+)?");
 
     private HttpRequestParser() {
@@ -29,27 +30,34 @@ public class HttpRequestParser {
         try {
             var curLine = br.readLine();
             var matcher = mainString.matcher(curLine);
+            matcher.find();
 
-            var method = methodParse(matcher);
-            builder.setMethod(method);
-
-            var path = pathParse(curLine, matcher);
-            builder.setPath(path);
-
-            Map<String, String> queryParameters;
-            if (curLine.contains("?")) {
-                queryParameters = queryParse(matcher);
-                builder.setQueryParameters(queryParameters);
+            var method = matcher.group("method");
+            if (!method.isEmpty()) {
+                builder.setMethod(methodParse(method));
+            } else {
+                throw new BadRequestException("Method is mandatory!");
             }
 
-            var protocol = protocolParse(matcher);
-            builder.setProtocol(protocol);
+            if (curLine.contains(" /")) {
+                builder.setPath(matcher.group("path"));
+            } else {
+                builder.setPath("");
+            }
+
+            if (curLine.contains("?")) {
+                var parameters = matcher.group("parameters");
+                builder.setQueryParameters(queryParse(parameters));
+            }
+
+            var protocol = matcher.group("protocol");
+            builder.setProtocol(protocolCheck(protocol));
 
             curLine = br.readLine();
             Map<String, String> headers = new HashMap<>();
             while (!curLine.equals("")) {
-                String[] pair = headersParse(curLine);
-                headers.put(pair[0], pair[1]);
+                Map.Entry<String, String> pair = headersParse(curLine);
+                headers.put(pair.getKey(), pair.getValue());
                 curLine = br.readLine();
             }
             builder.setHeaders(headers);
@@ -59,15 +67,15 @@ public class HttpRequestParser {
 
             var port = portParse(headers);
             builder.setPort(port);
+        } catch (BadRequestException e) {
+            throw e;
         } catch (Exception e) {
             throw new BadRequestException("Can't parse request");
         }
         return builder.build();
     }
 
-    private static String methodParse(Matcher matcher) {
-        matcher.find();
-        var method = matcher.group("method");
+    private static String methodParse(String method) {
         var methodIsSupported = false;
 
         for (HttpMethods elem : HttpMethods.values()) {
@@ -80,22 +88,12 @@ public class HttpRequestParser {
         if (methodIsSupported) {
             return method;
         } else {
-            throw new BadRequestException("Can't parse request");
+            throw new BadRequestException("Method not supported");
         }
     }
 
-    private static String pathParse(String curLine, Matcher matcher) {
-
-        if (curLine.contains(" /")) {
-            return matcher.group("path");
-        } else {
-            return "";
-        }
-    }
-
-    private static Map<String, String> queryParse(Matcher matcher) {
+    private static Map<String, String> queryParse(String parameters) {
         Map<String, String> queryParameters = new HashMap<>();
-        var parameters = matcher.group("parameters");
         Matcher pairsMatcher = pairsPattern.matcher(parameters);
 
         while (pairsMatcher.find()) {
@@ -107,25 +105,24 @@ public class HttpRequestParser {
         return queryParameters;
     }
 
-    private static String protocolParse(Matcher matcher) {
+    private static String protocolCheck(String protocol) {
         var defaultProtocol = "HTTP/1.1";
-        var protocol = matcher.group("protocol");
         if (defaultProtocol.equals(protocol)) {
             return protocol;
         } else {
-            throw new BadRequestException("Can't parse request");
+            throw new BadRequestException("Supported only HTTP/1.1");
         }
     }
 
-    private static String[] headersParse(String curLine) {
+    private static Map.Entry<String, String> headersParse(String curLine) {
         var matcher = headersPattern.matcher(curLine);
-        var headers = new String[2];
         matcher.find();
-        headers[0] = matcher.group("key").toLowerCase();
-        headers[1] = matcher.group("value").trim().toLowerCase();
+        var key = matcher.group("key").toLowerCase();
+        var value = matcher.group("value").trim().toLowerCase();
+        var headers = Map.entry(key, value);
 
-        if (headers[0].equals("") || headers[1].equals("")) {
-            throw new BadRequestException("Can't parse request");
+        if (headers.getKey().equals("") || headers.getValue().equals("")) {
+            throw new BadRequestException("Syntax error in header");
         } else {
             return headers;
         }
