@@ -1,6 +1,7 @@
 package com.study.server.http;
 
 import com.study.server.exceptions.BadRequestException;
+import com.study.server.utils.StringUtils;
 
 import java.io.BufferedReader;
 import java.io.InputStream;
@@ -33,25 +34,30 @@ public class HttpRequestParser {
             matcher.find();
 
             var method = matcher.group("method");
-            if (!method.isEmpty()) {
+            if (!StringUtils.isEmpty(method)) {
                 builder.setMethod(methodParse(method));
             } else {
                 throw new BadRequestException("Method is mandatory!");
             }
 
-            if (curLine.contains(" /")) {
-                builder.setPath(matcher.group("path"));
+            var path = matcher.group("path");
+            if (!StringUtils.isEmpty(path)) {
+                builder.setPath(path);
             } else {
                 builder.setPath("");
             }
 
-            if (curLine.contains("?")) {
-                var parameters = matcher.group("parameters");
+            var parameters = matcher.group("parameters");
+            if (!StringUtils.isEmpty(parameters)) {
                 builder.setQueryParameters(queryParse(parameters));
             }
 
             var protocol = matcher.group("protocol");
-            builder.setProtocol(protocolCheck(protocol));
+            if (checkProtocol(protocol)) {
+                builder.setProtocol(protocol);
+            } else {
+                throw new BadRequestException("Supported only HTTP/1.1");
+            }
 
             curLine = br.readLine();
             Map<String, String> headers = new HashMap<>();
@@ -62,10 +68,10 @@ public class HttpRequestParser {
             }
             builder.setHeaders(headers);
 
-            var host = hostParse(headers);
+            var host = extractHost(headers);
             builder.setHost(host);
 
-            var port = portParse(headers);
+            var port = extractPort(headers);
             builder.setPort(port);
         } catch (BadRequestException e) {
             throw e;
@@ -105,13 +111,9 @@ public class HttpRequestParser {
         return queryParameters;
     }
 
-    private static String protocolCheck(String protocol) {
+    private static boolean checkProtocol(String protocol) {
         var defaultProtocol = "HTTP/1.1";
-        if (defaultProtocol.equals(protocol)) {
-            return protocol;
-        } else {
-            throw new BadRequestException("Supported only HTTP/1.1");
-        }
+        return defaultProtocol.equals(protocol);
     }
 
     private static Map.Entry<String, String> headersParse(String curLine) {
@@ -128,7 +130,7 @@ public class HttpRequestParser {
         }
     }
 
-    private static String hostParse(Map<String, String> headers) {
+    private static String extractHost(Map<String, String> headers) {
         var hostLine = headers.get("host");
         var matcher = hostPattern.matcher(hostLine);
         matcher.find();
@@ -136,7 +138,7 @@ public class HttpRequestParser {
         return matcher.group("host");
     }
 
-    private static String portParse(Map<String, String> headers) {
+    private static String extractPort(Map<String, String> headers) {
         var hostLine = headers.get("host");
         var matcher = hostPattern.matcher(hostLine);
         matcher.find();
