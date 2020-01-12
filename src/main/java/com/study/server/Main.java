@@ -9,40 +9,40 @@ import java.util.Properties;
 
 public class Main {
     private static int defaultPort = 3333;
-    private static int defaultNumberOfThreads = 20;
+    private static int defaultPoolSize = 20;
 
     public static void main(String[] args) throws IOException {
-        Map<String, Integer> parametersOfHttpServer;
-        String sourceConfig = System.getenv().get("SitesAndConfigDirectory");
-        parametersOfHttpServer = readProperties(sourceConfig);
+        Map<String, Integer> parameters;
+        String sourceDir = System.getenv().get("CONF_DIR");
+        parameters = readProperties(sourceDir);
 
-        if (parametersOfHttpServer != null) {
-            Integer port = parametersOfHttpServer.get("port");
-            Integer numberOfThreads = parametersOfHttpServer.get("numberOfThreads");
+        if (parameters != null) {
+            Integer port = parameters.get("server.port");
+            Integer poolSize = parameters.get("server.pool-size");
 
-            HttpServerImpl server = new HttpServerImpl(port, numberOfThreads);
+            HttpServerImpl server = new HttpServerImpl(port, poolSize);
             server.start();
         } else {
             int port = defaultPort;
-            int numberOfThreads = defaultNumberOfThreads;
+            int poolSize = defaultPoolSize;
 
-            HttpServerImpl server = new HttpServerImpl(port, numberOfThreads);
+            HttpServerImpl server = new HttpServerImpl(port, poolSize);
             server.start();
         }
     }
 
     private static HashMap<String, Integer> readProperties(String sourceConfig) throws IOException {
-        HashMap<String, Integer> parametersOfHttpServer = new HashMap<>();
+        HashMap<String, Integer> parameters = new HashMap<>();
         Properties properties = new Properties();
         File file = new File(sourceConfig, "server-config.properties");
 
         if (file.exists()) {
             properties.load(new FileReader(file));
-            Integer port = Integer.parseInt(properties.getProperty("port"));
-            parametersOfHttpServer.put("port", port);
-            Integer numberOfThreads = Integer.parseInt(properties.getProperty("numberOfThreads"));
-            parametersOfHttpServer.put("numberOfThreads", numberOfThreads);
-            return parametersOfHttpServer;
+            Integer port = Integer.parseInt(properties.getProperty("server.port"));
+            parameters.put("port", port);
+            Integer poolSize = Integer.parseInt(properties.getProperty("server.pool-size"));
+            parameters.put("poolSize", poolSize);
+            return parameters;
         } else {
             return null;
         }
