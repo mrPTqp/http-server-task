@@ -21,7 +21,7 @@ public class RequestDispatcherImpl implements RequestDispatcher {
         Response response;
 
         if (controllers.isEmpty()) {
-            indexHtmlFilesPaths = findHtmlInDir();
+//            indexHtmlFilesPaths = findHtmlInDir();
             ControllerImpl controller = new ControllerImpl(indexHtmlFilesPaths);
             if (controller.match(request)) {
                 response = controller.handle(request);
@@ -38,7 +38,7 @@ public class RequestDispatcherImpl implements RequestDispatcher {
             response = controller.handle(request);
             return response;
         } else {
-            indexHtmlFilesPaths = findHtmlInDir();
+//            indexHtmlFilesPaths = findHtmlInDir();
             ControllerImpl controller = new ControllerImpl(indexHtmlFilesPaths);
             if (controller.match(request)) {
                 response = controller.handle(request);
@@ -51,8 +51,8 @@ public class RequestDispatcherImpl implements RequestDispatcher {
         }
     }
 
-    private List<String> findHtmlInDir() {
-        HtmlFinderImpl finder = new HtmlFinderImpl(sitesAndConfigDirectory);
-        return finder.findHtmlInDir();
-    }
+//    private List<String> findHtmlInDir() {
+//        HtmlFinderImpl finder = new HtmlFinderImpl(sitesAndConfigDirectory);
+//        return finder.findHtmlInDir();
+//    }
 }
