@@ -1,12 +1,14 @@
 package com.study.server;
 
+import java.util.Map;
+
 public class Main {
     public static void main(String[] args) {
-        ConfigurationReader cr = new ConfigurationReader(args);
-        cr.readConfig();
-        cr.createMapping();
+        ConfigurationReaderImpl cr = new ConfigurationReaderImpl();
+        ServerConfiguration config = cr.readConfig();
+        Map<String, String> mapping = cr.createMapping();
 
-        HttpServerImpl server = new HttpServerImpl(cr.getPort(), cr.getPoolSize());
+        HttpServerImpl server = new HttpServerImpl(config.getPort(), config.getPoolSize());
         server.start();
     }
 }
