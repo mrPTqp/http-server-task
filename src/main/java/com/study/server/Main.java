@@ -6,9 +6,9 @@ public class Main {
     public static void main(String[] args) {
         ConfigurationReaderImpl cr = new ConfigurationReaderImpl();
         ServerConfiguration config = cr.readConfig();
-        Map<String, String> mapping = cr.createMapping();
+        Map<String, String> mapping = cr.readMappings();
 
-        HttpServerImpl server = new HttpServerImpl(config.getPort(), config.getPoolSize());
+        HttpServerImpl server = new HttpServerImpl(config);
         server.start();
     }
 }

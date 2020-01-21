@@ -1,108 +1,72 @@
 package com.study.server;
 
-import com.study.server.exceptions.BadConfigException;
+import com.study.server.utils.ParsingPatterns;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileReader;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Properties;
 import java.util.regex.Pattern;
 
 public class ConfigurationReaderImpl implements ConfigurationReader {
+    private static final String MESSAGE = "The configuration directory " +
+            "does not contain valid site directories";
     private String sourceDir;
 
     public ConfigurationReaderImpl() {
-        try {
-            sourceDir = System.getenv().get("CONF_DIR");
-        } catch (Exception e) {
-            throw new BadConfigException("Missing environment variable CONF_DIR");
+        sourceDir = System.getenv().get("CONF_DIR");
+        if (sourceDir == null) {
+            throw new IllegalArgumentException("Missing environment variable CONF_DIR");
         }
     }
 
     @Override
     public ServerConfiguration readConfig() {
-        ServerConfiguration config = new ServerConfiguration();
+        int port;
+        int poolSize;
+
+        Properties properties = new Properties();
+        File file = new File(sourceDir, "server-config.properties");
+
         try {
-            int port;
-            int poolSize;
-
-            Properties properties = new Properties();
-            File file = new File(sourceDir, "server-config.properties");
-
             properties.load(new FileReader(file));
             port = Integer.parseInt(properties.getProperty("server.port"));
-            config.setPort(port);
             poolSize = Integer.parseInt(properties.getProperty("server.pool-size"));
-            config.setPoolSize(poolSize);
 
-            return config;
-        } catch (IOException e) {
-            return config;
+            return new ServerConfiguration(port, poolSize);
+        } catch (Exception e) {
+            return new ServerConfiguration();
         }
     }
 
     @Override
-    public Map<String, String> createMapping() {
-        Map<String, String> mapping = new HashMap<>();
-        Pattern jsonHostPattern = Pattern.compile(
-                "(^\\{\"siteName\":\")(?<jsonHost>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E]]]]+\\." +
-                        "[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E]]]]+)(\"\\})"
-        );
-        Pattern pathHostPattern = Pattern.compile(
-                "(.+\\\\)(?<pathHost>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E]]]]+\\." +
-                        "[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E]]]]+)"
-        );
+    public Map<String, String> readMappings() {
+        Map<String, String> mutableMappings = new HashMap<>();
         File[] dirs = new File(sourceDir).listFiles(File::isDirectory);
 
-        if (dirs.length > 0) {
-            for (File curPath : dirs) {
-                File jsonFile = new File(curPath.toString() + "\\site-name.json");
-                String host;
-
-                if (jsonFile.exists()) {
-                    host = getHostFromJson(jsonHostPattern, jsonFile);
-                } else {
-                    host = getHostFromPath(pathHostPattern, curPath);
-                }
-
-                mapping.put(host, curPath.toString());
-            }
-        } else {
-            throw new BadConfigException("The configuration directory does not contain valid site directories");
+        for (File curPath : dirs) {
+            String host = getHostFromPath(ParsingPatterns.pathHostPattern, curPath);
+            mutableMappings.put(host, curPath.toString());
         }
 
-        if (mapping.isEmpty()) {
-            throw new BadConfigException("The configuration directory does not contain valid site directories");
+        if (mutableMappings.isEmpty()) {
+            throw new NoSuchElementException(MESSAGE);
         }
 
-        return mapping;
+        return Collections.unmodifiableMap(mutableMappings);
     }
 
-    private String getHostFromJson(Pattern jsonHostPattern, File jsonFile) {
+    private String getHostFromPath(Pattern hostPattern, File curDir) {
         try {
-            var fis = new FileInputStream(jsonFile);
-            var bis = new BufferedInputStream(fis);
-            var br = new BufferedReader(new InputStreamReader(bis));
-            var curLine = br.readLine();
+            var hostMatcher = hostPattern.matcher(curDir.toString());
+            hostMatcher.find();
 
-            var jsonHostMatcher = jsonHostPattern.matcher(curLine);
-            jsonHostMatcher.find();
-
-            return jsonHostMatcher.group("jsonHost");
+            return hostMatcher.group("pathHost");
         } catch (Exception e) {
-            throw new BadConfigException("Invalid site-name.json content");
-        }
-    }
-
-    private String getHostFromPath(Pattern pathHostPattern, File curDir) {
-        try {
-            var pathHostMatcher = pathHostPattern.matcher(curDir.toString());
-            pathHostMatcher.find();
-
-            return pathHostMatcher.group("pathHost");
-        } catch (Exception e) {
-            throw new BadConfigException("The configuration directory " +
-                    "does not contain valid site directories");
+            throw new NoSuchElementException(MESSAGE);
         }
     }
 }

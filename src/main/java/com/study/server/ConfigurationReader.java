@@ -5,5 +5,5 @@ import java.util.Map;
 public interface ConfigurationReader {
     ServerConfiguration readConfig();
 
-    Map<String, String> createMapping();
+    Map<String, String> readMappings();
 }

@@ -1,6 +1,7 @@
 package com.study.server.http;
 
 import com.study.server.exceptions.BadRequestException;
+import com.study.server.utils.ParsingPatterns;
 import com.study.server.utils.StringUtils;
 
 import java.io.BufferedReader;
@@ -9,17 +10,8 @@ import java.io.InputStreamReader;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 public class HttpRequestParser {
-    private static Pattern mainString = Pattern.compile("(?<method>[\\x41-\\x5A]+)( )" +
-            "((?<path>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[./]]]]+)" +
-            "((\\?)(?<parameters>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[,.=&]]]]+))?)? " +
-            "(?<protocol>HTTP/[\\d].[\\d])"
-    );
-    private static Pattern pairsPattern = Pattern.compile("(?<key>[a-zA-Z\\d]+)=(?<value>[a-zA-Z\\d]+)");
-    private static Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+):(?<value>[\\x20-\\x7D]+)");
-    private static Pattern hostPattern = Pattern.compile("(?<host>[\\x20-\\x7D&&[^:]]+)(:)?(?<port>\\d+)?");
 
     private HttpRequestParser() {
     }
@@ -30,7 +22,7 @@ public class HttpRequestParser {
 
         try {
             var curLine = br.readLine();
-            var matcher = mainString.matcher(curLine);
+            var matcher = ParsingPatterns.mainString.matcher(curLine);
             matcher.find();
 
             var method = matcher.group("method");
@@ -100,7 +92,7 @@ public class HttpRequestParser {
 
     private static Map<String, String> queryParse(String parameters) {
         Map<String, String> queryParameters = new HashMap<>();
-        Matcher pairsMatcher = pairsPattern.matcher(parameters);
+        Matcher pairsMatcher = ParsingPatterns.pairsPattern.matcher(parameters);
 
         while (pairsMatcher.find()) {
             var key = pairsMatcher.group("key").toLowerCase();
@@ -117,7 +109,7 @@ public class HttpRequestParser {
     }
 
     private static Map.Entry<String, String> headersParse(String curLine) {
-        var matcher = headersPattern.matcher(curLine);
+        var matcher = ParsingPatterns.headersPattern.matcher(curLine);
         matcher.find();
         var key = matcher.group("key").toLowerCase();
         var value = matcher.group("value").trim().toLowerCase();
@@ -132,7 +124,7 @@ public class HttpRequestParser {
 
     private static String extractHost(Map<String, String> headers) {
         var hostLine = headers.get("host");
-        var matcher = hostPattern.matcher(hostLine);
+        var matcher = ParsingPatterns.hostPattern.matcher(hostLine);
         matcher.find();
 
         return matcher.group("host");
@@ -140,7 +132,7 @@ public class HttpRequestParser {
 
     private static String extractPort(Map<String, String> headers) {
         var hostLine = headers.get("host");
-        var matcher = hostPattern.matcher(hostLine);
+        var matcher = ParsingPatterns.hostPattern.matcher(hostLine);
         matcher.find();
 
         if (matcher.group("port") == null) {
