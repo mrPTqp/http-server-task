@@ -1,7 +1,7 @@
 package com.study.server.http;
 
 import com.study.server.exceptions.BadRequestException;
-import com.study.server.utils.ParsingPatterns;
+import com.study.server.utils.HttpPatterns;
 import com.study.server.utils.StringUtils;
 
 import java.io.BufferedReader;
@@ -22,7 +22,7 @@ public class HttpRequestParser {
 
         try {
             var curLine = br.readLine();
-            var matcher = ParsingPatterns.mainString.matcher(curLine);
+            var matcher = HttpPatterns.mainString.matcher(curLine);
             matcher.find();
 
             var method = matcher.group("method");
@@ -92,7 +92,7 @@ public class HttpRequestParser {
 
     private static Map<String, String> queryParse(String parameters) {
         Map<String, String> queryParameters = new HashMap<>();
-        Matcher pairsMatcher = ParsingPatterns.pairsPattern.matcher(parameters);
+        Matcher pairsMatcher = HttpPatterns.pairsPattern.matcher(parameters);
 
         while (pairsMatcher.find()) {
             var key = pairsMatcher.group("key").toLowerCase();
@@ -109,7 +109,7 @@ public class HttpRequestParser {
     }
 
     private static Map.Entry<String, String> headersParse(String curLine) {
-        var matcher = ParsingPatterns.headersPattern.matcher(curLine);
+        var matcher = HttpPatterns.headersPattern.matcher(curLine);
         matcher.find();
         var key = matcher.group("key").toLowerCase();
         var value = matcher.group("value").trim().toLowerCase();
@@ -124,7 +124,7 @@ public class HttpRequestParser {
 
     private static String extractHost(Map<String, String> headers) {
         var hostLine = headers.get("host");
-        var matcher = ParsingPatterns.hostPattern.matcher(hostLine);
+        var matcher = HttpPatterns.hostPattern.matcher(hostLine);
         matcher.find();
 
         return matcher.group("host");
@@ -132,7 +132,7 @@ public class HttpRequestParser {
 
     private static String extractPort(Map<String, String> headers) {
         var hostLine = headers.get("host");
-        var matcher = ParsingPatterns.hostPattern.matcher(hostLine);
+        var matcher = HttpPatterns.hostPattern.matcher(hostLine);
         matcher.find();
 
         if (matcher.group("port") == null) {

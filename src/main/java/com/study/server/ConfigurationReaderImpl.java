@@ -1,10 +1,13 @@
 package com.study.server;
 
-import com.study.server.utils.ParsingPatterns;
+import com.study.server.utils.HttpPatterns;
 
 import java.io.File;
 import java.io.FileReader;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Properties;
 
 public class ConfigurationReaderImpl implements ConfigurationReader {
     private String sourceDir;
@@ -37,24 +40,22 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
 
     @Override
     public Map<String, String> readMappings() {
-        Map<String, String> mutableMappings = new HashMap<>();
+        Map<String, String> mappings = new HashMap<>();
         File[] dirs = new File(sourceDir).listFiles(File::isDirectory);
 
-        for (File curPath : dirs) {
+        for (File dir : dirs) {
             String host;
-            var hostMatcher = ParsingPatterns.pathHostPattern.matcher(curPath.toString());
+            var hostMatcher = HttpPatterns.pathHostPattern.matcher(dir.getPath());
             if (hostMatcher.find()) {
                 host = hostMatcher.group("pathHost");
-                mutableMappings.put(host, curPath.toString());
-            } else {
-                System.out.println("No directory matching host pattern was found in the path " + curPath.toString());
+                mappings.put(host, dir.toString());
             }
         }
 
-        if (mutableMappings.isEmpty()) {
+        if (mappings.isEmpty()) {
             throw new NoSuchElementException("The configuration directory does not contain valid site directories");
         }
 
-        return Collections.unmodifiableMap(mutableMappings);
+        return Map.copyOf(mappings);
     }
 }

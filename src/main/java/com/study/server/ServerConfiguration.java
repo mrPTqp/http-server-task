@@ -1,14 +1,12 @@
 package com.study.server;
 
 public class ServerConfiguration {
-    private final int defaultPort = 3333;
-    private final int defaultPoolSize = 20;
-    private int port;
-    private int poolSize;
+    private final int port;
+    private final int poolSize;
 
     public ServerConfiguration() {
-        this.port = defaultPort;
-        this.poolSize = defaultPoolSize;
+        this.port = 3333;
+        this.poolSize = 20;
     }
 
     public ServerConfiguration(int port, int poolSize) {

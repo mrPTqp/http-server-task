@@ -2,7 +2,7 @@ package com.study.server.utils;
 
 import java.util.regex.Pattern;
 
-public class ParsingPatterns {
+public class HttpPatterns {
     public static final Pattern mainString = Pattern.compile(
             "(?<method>[\\x41-\\x5A]+)( )((?<path>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[./]]]]+)" +
                     "((\\?)(?<parameters>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[,.=&]]]]+))?)? " +
