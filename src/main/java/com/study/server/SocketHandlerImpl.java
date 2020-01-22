@@ -1,15 +1,12 @@
 package com.study.server;
 
+import com.study.server.http.HttpRequest;
+import com.study.server.http.HttpRequestParser;
 import com.study.server.http.Response;
 import com.study.server.http.StatusCode;
 
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Map;
@@ -25,62 +22,36 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
 
     @Override
     public void run() {
-        String sitesAndConfigDirectory;
-
-        if (System.getenv().get("SitesAndConfigDirectory") != null) {
-            sitesAndConfigDirectory = System.getenv().get("SitesAndConfigDirectory");
-        } else {
-            sitesAndConfigDirectory = "D:\\temp\\sites&config";
-        }
-
-//        String inputLine = readLine();
-//        RequestParserImpl parser = new RequestParserImpl(inputLine);
-
         try {
             in = clientSocket.getInputStream();
             out = clientSocket.getOutputStream();
+            HttpRequest request = HttpRequestParser.parse(in);
 
 //            if (!parser.parse(inputLine)) {
 //                respond(500, "Unable to parse request", out);
 //                return;
 //            }
 
-//            Request request = parser.getRequest();
-//            RequestDispatcherImpl dispatcher = new RequestDispatcherImpl(request);
+            RequestDispatcherImpl dispatcher = new RequestDispatcherImpl(request);
 //            response = dispatcher.dispatch();
 //            sendResponse(response);
 
 
-            File myFile = new File(sitesAndConfigDirectory + "\\www.food.com\\index.html");
-            byte[] myByteArray = new byte[(int) myFile.length()];
-
-            FileInputStream fis = new FileInputStream(myFile);
-            BufferedInputStream bis = new BufferedInputStream(fis);
-            bis.read(myByteArray);
-
-            out.write(("HTTP/1.1 200 OK" + "\r\n\r\n").getBytes());
-            out.write(myByteArray);
-
-            out.close();
-            System.out.println("File is transferred");
-            in.close();
+//            File myFile = new File(sitesAndConfigDirectory + "\\www.food.com\\index.html");
+//            byte[] myByteArray = new byte[(int) myFile.length()];
+//
+//            FileInputStream fis = new FileInputStream(myFile);
+//            BufferedInputStream bis = new BufferedInputStream(fis);
+//            bis.read(myByteArray);
+//
+//            out.write(("HTTP/1.1 200 OK" + "\r\n\r\n").getBytes());
+//            out.write(myByteArray);
+//
+//            out.close();
+//            System.out.println("File is transferred");
+//            in.close();
         } catch (IOException e) {
             e.printStackTrace();
-        }
-    }
-
-    private String readLine() {
-        try {
-            final BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-            String inputLine;
-            final StringBuilder content = new StringBuilder();
-            while (!(inputLine = in.readLine()).equals("")) {
-                content.append(inputLine).append("\n");
-            }
-            return content.toString();
-        } catch (final Exception ex) {
-            ex.printStackTrace();
-            return "";
         }
     }
 

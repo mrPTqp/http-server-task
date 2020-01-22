@@ -13,9 +13,9 @@ public class HttpServerImpl implements HttpServer {
     private ServerSocket serverSocket = null;
     private ExecutorService executor;
 
-    public HttpServerImpl(int port, int poolSize) {
-        this.port = port;
-        this.poolSize = poolSize;
+    public HttpServerImpl(ServerConfiguration config) {
+        this.port = config.getPort();
+        this.poolSize = config.getPoolSize();
         this.executor = Executors.newFixedThreadPool(poolSize);
     }
 
