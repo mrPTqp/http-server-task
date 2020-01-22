@@ -48,7 +48,7 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
             var hostMatcher = HttpPatterns.pathHostPattern.matcher(dir.getPath());
             if (hostMatcher.find()) {
                 host = hostMatcher.group("pathHost");
-                mappings.put(host, dir.toString());
+                mappings.put(host, dir.getPath());
             }
         }
 
