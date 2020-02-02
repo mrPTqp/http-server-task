@@ -1,5 +1,6 @@
 package com.study.server.http;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
 
@@ -13,15 +14,22 @@ public class HttpRequest {
     private final Map<String, String> headers;
     private final String body;
 
-    private HttpRequest(Builder builder) {
-        method = builder.method;
-        path = builder.path;
-        queryParameters = builder.queryParameters;
-        protocol = builder.protocol;
-        host = builder.host;
-        port = builder.port;
-        headers = builder.headers;
-        body = builder.body;
+    private HttpRequest(String method,
+                        String path,
+                        Map<String, String> queryParameters,
+                        String protocol,
+                        String host,
+                        String port,
+                        Map<String, String> headers,
+                        String body) {
+        this.method = method;
+        this.path = path;
+        this.queryParameters = queryParameters;
+        this.protocol = protocol;
+        this.host = host;
+        this.port = port;
+        this.headers = headers;
+        this.body = body;
     }
 
     public String getMethod() {
@@ -78,13 +86,13 @@ public class HttpRequest {
 
     public static class Builder {
         private String method;
-        private String path;
+        private String path = "/";
         private String host;
-        private String protocol;
-        private Map<String, String> queryParameters;
-        private Map<String, String> headers;
-        private String port;
-        private String body;
+        private String protocol = "HTTP/1.1";
+        private Map<String, String> queryParameters = Collections.emptyMap();
+        private Map<String, String> headers = Collections.emptyMap();
+        private String port = "80";
+        private String body = "";
 
         public Builder() {
         }
@@ -130,7 +138,7 @@ public class HttpRequest {
         }
 
         public HttpRequest build() {
-            return new HttpRequest(this);
+            return new HttpRequest(method, path, queryParameters, protocol, host, port, headers, body);
         }
     }
 }

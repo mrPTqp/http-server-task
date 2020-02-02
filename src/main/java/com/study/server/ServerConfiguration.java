@@ -5,8 +5,8 @@ public class ServerConfiguration {
     private final int poolSize;
 
     public ServerConfiguration() {
-        this.port = 3333;
-        this.poolSize = 20;
+        port = 3333;
+        poolSize = 20;
     }
 
     public ServerConfiguration(int port, int poolSize) {

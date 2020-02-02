@@ -1,58 +1,28 @@
 package com.study.server;
 
-import com.study.server.controller.ControllerImpl;
+import com.study.server.controller.FileController;
 import com.study.server.http.HttpRequest;
-import com.study.server.http.Response;
+import com.study.server.http.HttpResponse;
+import com.study.server.http.StatusCode;
 
-import java.util.HashMap;
-import java.util.List;
+import java.util.Collections;
+import java.util.Map;
+import java.util.Set;
 
 public class RequestDispatcherImpl implements RequestDispatcher {
-    private HttpRequest request;
-    private String sitesAndConfigDirectory = System.getenv().get("SitesAndConfigDirectory");
-    private HashMap<HttpRequest, ControllerImpl> controllers = new HashMap<>();
-    private List<String> indexHtmlFilesPaths;
+    Set<FileController> controllers = Collections.emptySet();
 
-    public RequestDispatcherImpl(HttpRequest request) {
-        this.request = request;
+    public RequestDispatcherImpl(Set<FileController> controllers) {
+        this.controllers = controllers;
     }
 
-    Response dispatch() {
-        Response response;
-
-        if (controllers.isEmpty()) {
-//            indexHtmlFilesPaths = findHtmlInDir();
-            ControllerImpl controller = new ControllerImpl(indexHtmlFilesPaths);
-            if (controller.match(request)) {
-                response = controller.handle(request);
-                controllers.put(request, controller);
-                System.out.println(controllers);
-                return response;
-            } else {
-                return null;
-            }
-        }
-
-        if (controllers.containsValue(request)) {
-            ControllerImpl controller = controllers.get(request);
-            response = controller.handle(request);
-            return response;
-        } else {
-//            indexHtmlFilesPaths = findHtmlInDir();
-            ControllerImpl controller = new ControllerImpl(indexHtmlFilesPaths);
-            if (controller.match(request)) {
-                response = controller.handle(request);
-                controllers.put(request, controller);
-                System.out.println(controllers);
-                return response;
-            } else {
-                return null;
-            }
-        }
+    @Override
+    public HttpResponse dispatch(HttpRequest request) {
+        HttpResponse.Builder builder = new HttpResponse.Builder();
+        return builder.setProtocol("HTTP/1.1")
+                .setStatusCode(StatusCode._404.toString())
+                .setHeaders(Map.of())
+                .setBody("body")
+                .build();
     }
-
-//    private List<String> findHtmlInDir() {
-//        HtmlFinderImpl finder = new HtmlFinderImpl(sitesAndConfigDirectory);
-//        return finder.findHtmlInDir();
-//    }
 }

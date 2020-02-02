@@ -1,0 +1,18 @@
+HTTP/1.1 200 OK
+Content-Type: text/html; charset=utf-8
+Server: Apache
+Content-Language: ru
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" href="css/bar.css">
+    <link rel="stylesheet" href="css/foo.css">
+    <title>Food</title>
+</head>
+<body>
+<p>Food</p>
+<script src="js/script.js"></script>
+</body>
+</html>

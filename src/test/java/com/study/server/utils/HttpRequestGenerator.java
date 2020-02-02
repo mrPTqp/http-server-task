@@ -2,6 +2,7 @@ package com.study.server.utils;
 
 import com.study.server.http.HttpRequest;
 
+import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;
 
@@ -24,7 +25,7 @@ public class HttpRequestGenerator {
         var methodGen = method.orElse("GET");
         var pathGen = path.orElse("/");
         var protocolGen = protocol.orElse("HTTP/1.1");
-        var queryGen = queryParameters.orElse(null);
+        var queryGen = queryParameters.orElse(Collections.emptyMap());
         var headersGen = headers.orElse(defaultHeaders);
         var hostGen = host.orElse("food.com");
         var portGen = port.orElse("80");
