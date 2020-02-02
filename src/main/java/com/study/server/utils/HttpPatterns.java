@@ -12,7 +12,7 @@ public class HttpPatterns {
             "(?<key>[a-zA-Z\\d]+)=(?<value>[a-zA-Z\\d]+)"
     );
     public static final Pattern headersPattern = Pattern.compile(
-            "(?<key>[\\x20-\\x7D&&[^:]]+):(?<value>[\\x20-\\x7D]+)"
+            "(?<key>[\\x20-\\x7D&&[^:]]+)(: )(?<value>[\\x20-\\x7D]+)"
     );
     public static final Pattern hostPattern = Pattern.compile(
             "(?<host>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E[^:]]]]]+)(:)?(?<port>\\d+)?"
