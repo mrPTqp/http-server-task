@@ -1,28 +1,28 @@
 package com.study.server;
 
-import com.study.server.controller.FileController;
+import com.study.server.controller.Controller;
 import com.study.server.http.HttpRequest;
 import com.study.server.http.HttpResponse;
 import com.study.server.http.StatusCode;
 
-import java.util.Collections;
-import java.util.Map;
 import java.util.Set;
 
 public class RequestDispatcherImpl implements RequestDispatcher {
-    Set<FileController> controllers = Collections.emptySet();
+    private Set<Controller> controllers;
 
-    public RequestDispatcherImpl(Set<FileController> controllers) {
+    public RequestDispatcherImpl(Set<Controller> controllers) {
         this.controllers = controllers;
     }
 
-    @Override
     public HttpResponse dispatch(HttpRequest request) {
-        HttpResponse.Builder builder = new HttpResponse.Builder();
-        return builder.setProtocol("HTTP/1.1")
+        for (Controller controller : controllers) {
+            if (controller.match(request)) {
+                return controller.handle(request);
+            }
+        }
+
+        return new HttpResponse.Builder().setProtocol("HTTP/1.1")
                 .setStatusCode(StatusCode._404.toString())
-                .setHeaders(Map.of())
-                .setBody("body")
                 .build();
     }
 }
