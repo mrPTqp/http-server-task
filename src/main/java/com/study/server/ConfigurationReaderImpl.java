@@ -6,7 +6,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Properties;
 
 public class ConfigurationReaderImpl implements ConfigurationReader {
@@ -53,7 +52,7 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
         }
 
         if (mappings.isEmpty()) {
-            throw new NoSuchElementException("The configuration directory does not contain valid site directories");
+            throw new RuntimeException("The configuration directory does not contain valid site directories");
         }
 
         return Map.copyOf(mappings);

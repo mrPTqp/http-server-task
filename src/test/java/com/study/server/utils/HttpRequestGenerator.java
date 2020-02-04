@@ -108,4 +108,18 @@ public class HttpRequestGenerator {
                 empty()
         );
     }
+
+    public static HttpRequest createBadRequest() {
+        var method = " ";
+
+        return prepareRequest(
+                Optional.of(method),
+                empty(),
+                empty(),
+                empty(),
+                empty(),
+                empty(),
+                empty()
+        );
+    }
 }
