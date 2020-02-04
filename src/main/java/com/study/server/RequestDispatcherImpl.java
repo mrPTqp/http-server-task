@@ -8,9 +8,13 @@ import com.study.server.http.StatusCode;
 import java.util.Set;
 
 public class RequestDispatcherImpl implements RequestDispatcher {
-    private Set<Controller> controllers;
+    private final Set<Controller> controllers;
 
     public RequestDispatcherImpl(Set<Controller> controllers) {
+        if (controllers == null || controllers.isEmpty()) {
+            throw new RuntimeException("The set of controllers is empty");
+        }
+
         this.controllers = controllers;
     }
 
