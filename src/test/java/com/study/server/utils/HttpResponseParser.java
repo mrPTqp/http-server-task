@@ -11,12 +11,12 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public class HttpResponseParser {
-    public static final Pattern statusString = Pattern.compile("(?<protocol>HTTP/[\\d].[\\d])( )" +
-            "(?<statusCode>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[ ]]]]+)"
+    public static final Pattern statusString = Pattern.compile("(?<protocol>HTTP/[\\d].[\\d])( )"
+            + "(?<statusCode>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[ ]]]]+)"
     );
 
-    public static final Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+)" +
-            "(: )(?<value>[\\x20-\\x7D]+)"
+    public static final Pattern headersPattern = Pattern.compile("(?<key>[\\x20-\\x7D&&[^:]]+)"
+            + "(: )(?<value>[\\x20-\\x7D]+)"
     );
 
     private HttpResponseParser() {
@@ -26,7 +26,7 @@ public class HttpResponseParser {
         var br = new BufferedReader(new InputStreamReader(in));
         var builder = new HttpResponse.Builder();
 
-        String curLine = null;
+        String curLine;
         try {
             curLine = br.readLine();
             var statusMatcher = statusString.matcher(curLine);
@@ -70,8 +70,7 @@ public class HttpResponseParser {
         matcher.find();
         var key = matcher.group("key");
         var value = matcher.group("value");
-        var headers = Map.entry(key, value);
 
-        return headers;
+        return Map.entry(key, value);
     }
 }

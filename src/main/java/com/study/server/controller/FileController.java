@@ -25,30 +25,11 @@ public class FileController implements Controller {
     @Override
     public HttpResponse handle(HttpRequest request) {
         HttpResponse.Builder builder = new HttpResponse.Builder();
-        HttpResponse response = builder.setProtocol("HTTP/1.1")
+
+        return builder.setProtocol("HTTP/1.1")
                 .setStatusCode(StatusCode._404.toString())
                 .setHeaders(Map.of())
                 .setBody("body")
                 .build();
-//        StringBuffer buf = new StringBuffer();
-//
-//        try {
-//            FileInputStream file = new FileInputStream(path);
-//
-//            int c;
-//            while ((c = file.read()) != -1) {
-//                buf.append((char) c);
-//            }
-//
-//            response.setResponseCode(StatusCode._200);
-//            response.addHeader("Content-Type", "text/html");
-//            response.addBody(buf.toString());
-//        } catch (FileNotFoundException e) {
-//            e.printStackTrace();
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-
-        return response;
     }
 }

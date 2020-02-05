@@ -15,7 +15,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should parse GET request case-insensitive headers")
-    void parseGET() {
+    void parseGet() {
         var expectedRequest = HttpRequestGenerator.createGetRequest();
 
         var is = readFile("GET");
@@ -27,7 +27,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should parse PUT request without path")
-    void parsePUT() {
+    void parsePut() {
         var expectedRequest = HttpRequestGenerator.createPutRequest();
 
         var is = readFile("PUT");
@@ -39,7 +39,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should parse POST request with Host header only")
-    void parsePOST() {
+    void parsePost() {
         var expectedRequest = HttpRequestGenerator.createPostRequest();
 
         var is = readFile("POST");
@@ -51,7 +51,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should DELETE request in which header Host is not in the first place")
-    void parseDELETE() {
+    void parseDelete() {
         var expectedRequest = HttpRequestGenerator.createDeleteRequest();
 
         var is = readFile("DELETE");
@@ -63,7 +63,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should throw BadRequestException, if the method is absent")
-    void BadRequestExceptionTest1() {
+    void badRequestExceptionTest1() {
         var is = readFile("bad1");
         var bis = new BufferedInputStream(is);
 
@@ -72,7 +72,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should throw BadRequestException, if the method is incorrect or not supported")
-    void BadRequestExceptionTest2() {
+    void badRequestExceptionTest2() {
         var is = readFile("bad2");
         var bis = new BufferedInputStream(is);
 
@@ -81,7 +81,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should throw BadRequestException, if the version of HTTP protocol difference by HTTP/1.1")
-    void BadRequestExceptionTest3() {
+    void badRequestExceptionTest3() {
         var is = readFile("bad3");
         var bis = new BufferedInputStream(is);
 
@@ -90,7 +90,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should throw BadRequestException, if the path contain non-ASCII symbols")
-    void BadRequestExceptionTest4() {
+    void badRequestExceptionTest4() {
         var is = readFile("bad4");
         var bis = new BufferedInputStream(is);
 
@@ -99,7 +99,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should throw BadRequestException, if the headers contain non-ASCII symbols")
-    void BadRequestExceptionTest5() {
+    void badRequestExceptionTest5() {
         var is = readFile("bad5");
         var bis = new BufferedInputStream(is);
 
@@ -108,7 +108,7 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should throw BadRequestException, if the Host header absent")
-    void BadRequestExceptionTest6() {
+    void badRequestExceptionTest6() {
         var is = readFile("bad6");
         var bis = new BufferedInputStream(is);
 

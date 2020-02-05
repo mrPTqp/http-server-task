@@ -4,9 +4,9 @@ import java.util.regex.Pattern;
 
 public class HttpPatterns {
     public static final Pattern mainString = Pattern.compile(
-            "(?<method>[\\x41-\\x5A]+)( )((?<path>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[./]]]]+)" +
-                    "((\\?)(?<parameters>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[,.=&]]]]+))?)? " +
-                    "(?<protocol>HTTP/[\\d].[\\d])"
+            "(?<method>[\\x41-\\x5A]+)( )((?<path>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[./]]]]+)"
+                    + "((\\?)(?<parameters>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[,.=&]]]]+))?)? "
+                    + "(?<protocol>HTTP/[\\d].[\\d])"
     );
     public static final Pattern pairsPattern = Pattern.compile(
             "(?<key>[a-zA-Z\\d]+)=(?<value>[a-zA-Z\\d]+)"
@@ -19,7 +19,7 @@ public class HttpPatterns {
     );
 
     public static Pattern pathHostPattern = Pattern.compile(
-            "(.+\\\\)(?<pathHost>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E[^:]]]]]+\\." +
-                    "[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E]]]]+)"
+            "(.+\\\\)(?<pathHost>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E[^:]]]]]+\\."
+                    + "[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E]]]]+)"
     );
 }

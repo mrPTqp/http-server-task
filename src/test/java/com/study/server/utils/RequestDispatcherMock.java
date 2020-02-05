@@ -28,8 +28,7 @@ public class RequestDispatcherMock implements RequestDispatcher {
                 "Server", "Apache"
         );
 
-        final String body = "HTML\n" +
-                "it's cool";
+        final String body = "HTML\nit's cool";
         HttpResponse.Builder builder = new HttpResponse.Builder();
 
         return builder.setProtocol("HTTP/1.1")

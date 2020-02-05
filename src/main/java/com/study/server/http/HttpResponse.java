@@ -44,14 +44,20 @@ public class HttpResponse {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         HttpResponse response = (HttpResponse) o;
 
-        return Objects.equals(protocol, response.protocol) &&
-                Objects.equals(statusCode, response.statusCode) &&
-                Objects.equals(headers, response.headers) &&
-                Objects.equals(body, response.body);
+        return Objects.equals(protocol, response.protocol)
+                && Objects.equals(statusCode, response.statusCode)
+                && Objects.equals(headers, response.headers)
+                && Objects.equals(body, response.body);
     }
 
     @Override

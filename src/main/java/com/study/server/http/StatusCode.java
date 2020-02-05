@@ -43,7 +43,6 @@ public enum StatusCode {
     _505("505 HTTP Version not supported");
 
     private final String status;
-
     StatusCode(String status) {
         this.status = status;
     }

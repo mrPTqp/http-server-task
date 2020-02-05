@@ -66,17 +66,23 @@ public class HttpRequest {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         HttpRequest that = (HttpRequest) o;
-        return Objects.equals(method, that.method) &&
-                Objects.equals(path, that.path) &&
-                Objects.equals(queryParameters, that.queryParameters) &&
-                Objects.equals(protocol, that.protocol) &&
-                Objects.equals(host, that.host) &&
-                Objects.equals(port, that.port) &&
-                Objects.equals(headers, that.headers) &&
-                Objects.equals(body, that.body);
+        return Objects.equals(method, that.method)
+                && Objects.equals(path, that.path)
+                && Objects.equals(queryParameters, that.queryParameters)
+                && Objects.equals(protocol, that.protocol)
+                && Objects.equals(host, that.host)
+                && Objects.equals(port, that.port)
+                && Objects.equals(headers, that.headers)
+                && Objects.equals(body, that.body);
     }
 
     @Override
