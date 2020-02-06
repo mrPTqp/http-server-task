@@ -1,5 +1,6 @@
 package com.study.server.http;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -39,7 +40,7 @@ public class HttpResponse {
         headers.forEach((k, v) -> sb.append(k).append(": ").append(v).append("\r\n"));
         sb.append("\r\n");
         sb.append(body);
-        return sb.toString().getBytes();
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     @Override

@@ -24,9 +24,7 @@ public class FileController implements Controller {
 
     @Override
     public HttpResponse handle(HttpRequest request) {
-        HttpResponse.Builder builder = new HttpResponse.Builder();
-
-        return builder.setProtocol("HTTP/1.1")
+        return new HttpResponse.Builder().setProtocol("HTTP/1.1")
                 .setStatusCode(StatusCode._404.toString())
                 .setHeaders(Map.of())
                 .setBody("body")

@@ -4,6 +4,8 @@ import com.study.server.utils.HttpPatterns;
 
 import java.io.File;
 import java.io.FileReader;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
@@ -26,13 +28,13 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
         Properties properties = new Properties();
         File file = new File(sourceDir, "server-config.properties");
 
-        try {
-            properties.load(new FileReader(file));
+        try (FileReader reader = new FileReader(file, StandardCharsets.UTF_8)) {
+            properties.load(reader);
             port = Integer.parseInt(properties.getProperty("server.port"));
             poolSize = Integer.parseInt(properties.getProperty("server.pool-size"));
 
             return new ServerConfiguration(port, poolSize);
-        } catch (Exception e) {
+        } catch (IOException e) {
             return new ServerConfiguration();
         }
     }
@@ -42,13 +44,17 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
         Map<String, String> mappings = new HashMap<>();
         File[] dirs = new File(sourceDir).listFiles(File::isDirectory);
 
-        for (File dir : dirs) {
-            String host;
-            var hostMatcher = HttpPatterns.pathHostPattern.matcher(dir.getPath());
-            if (hostMatcher.find()) {
-                host = hostMatcher.group("pathHost");
-                mappings.put(host, dir.getPath());
+        if (dirs != null) {
+            for (File dir : dirs) {
+                String host;
+                var hostMatcher = HttpPatterns.pathHostPattern.matcher(dir.getPath());
+                if (hostMatcher.find()) {
+                    host = hostMatcher.group("pathHost");
+                    mappings.put(host, dir.getPath());
+                }
             }
+        } else {
+            throw new RuntimeException("The configuration directory does not contain directories");
         }
 
         if (mappings.isEmpty()) {

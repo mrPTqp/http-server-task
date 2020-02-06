@@ -7,6 +7,7 @@ import com.study.server.utils.StringUtils;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -17,7 +18,7 @@ public class HttpRequestParser {
     }
 
     public static HttpRequest parse(InputStream in) {
-        var br = new BufferedReader(new InputStreamReader(in));
+        var br = new BufferedReader(new InputStreamReader(in, StandardCharsets.UTF_8));
         var builder = new HttpRequest.Builder();
 
         try {
@@ -53,7 +54,7 @@ public class HttpRequestParser {
 
             curLine = br.readLine();
             Map<String, String> headers = new HashMap<>();
-            while (!curLine.equals("")) {
+            while (curLine != null && !curLine.equals("")) {
                 Map.Entry<String, String> pair = headersParse(curLine);
                 headers.put(pair.getKey(), pair.getValue());
                 curLine = br.readLine();

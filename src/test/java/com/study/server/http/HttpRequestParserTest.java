@@ -6,6 +6,7 @@ import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 
 import java.io.BufferedInputStream;
+import java.io.IOException;
 
 import static com.study.server.utils.TestUtils.readFile;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -63,55 +64,61 @@ class HttpRequestParserTest {
 
     @Test
     @DisplayName("Should throw BadRequestException, if the method is absent")
-    void badRequestExceptionTest1() {
+    void badRequestExceptionTest1() throws IOException {
         var is = readFile("bad1");
         var bis = new BufferedInputStream(is);
 
         assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+        bis.close();
     }
 
     @Test
     @DisplayName("Should throw BadRequestException, if the method is incorrect or not supported")
-    void badRequestExceptionTest2() {
+    void badRequestExceptionTest2() throws IOException {
         var is = readFile("bad2");
         var bis = new BufferedInputStream(is);
 
         assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+        bis.close();
     }
 
     @Test
     @DisplayName("Should throw BadRequestException, if the version of HTTP protocol difference by HTTP/1.1")
-    void badRequestExceptionTest3() {
+    void badRequestExceptionTest3() throws IOException {
         var is = readFile("bad3");
         var bis = new BufferedInputStream(is);
 
         assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+        bis.close();
     }
 
     @Test
     @DisplayName("Should throw BadRequestException, if the path contain non-ASCII symbols")
-    void badRequestExceptionTest4() {
+    void badRequestExceptionTest4() throws IOException {
         var is = readFile("bad4");
         var bis = new BufferedInputStream(is);
 
         assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+        bis.close();
     }
 
     @Test
     @DisplayName("Should throw BadRequestException, if the headers contain non-ASCII symbols")
-    void badRequestExceptionTest5() {
+    void badRequestExceptionTest5() throws IOException {
         var is = readFile("bad5");
         var bis = new BufferedInputStream(is);
 
         assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+        bis.close();
     }
 
     @Test
     @DisplayName("Should throw BadRequestException, if the Host header absent")
-    void badRequestExceptionTest6() {
+    void badRequestExceptionTest6() throws IOException {
         var is = readFile("bad6");
         var bis = new BufferedInputStream(is);
 
         assertThrows(BadRequestException.class, () -> HttpRequestParser.parse(bis));
+        bis.close();
     }
 }

@@ -18,7 +18,7 @@ public class HttpPatterns {
             "(?<host>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E[^:]]]]]+)(:)?(?<port>\\d+)?"
     );
 
-    public static Pattern pathHostPattern = Pattern.compile(
+    public static final Pattern pathHostPattern = Pattern.compile(
             "(.+\\\\)(?<pathHost>[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E[^:]]]]]+\\."
                     + "[\\x41-\\x5A[\\x61-\\x7A[\\x30-\\x39[\\x2D-\\x2E]]]]+)"
     );

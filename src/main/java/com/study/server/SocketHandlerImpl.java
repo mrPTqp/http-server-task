@@ -8,6 +8,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
+import java.nio.charset.StandardCharsets;
 
 public class SocketHandlerImpl implements SocketHandler, Runnable {
     private final InputStream in;
@@ -44,6 +45,6 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
 
     private void respond(String statusCode, OutputStream out) throws IOException {
         String responseLine = "HTTP/1.1 " + statusCode + "\r\n\r\n";
-        out.write(responseLine.getBytes());
+        out.write(responseLine.getBytes(StandardCharsets.UTF_8));
     }
 }
