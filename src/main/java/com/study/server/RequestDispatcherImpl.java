@@ -5,6 +5,7 @@ import com.study.server.http.HttpRequest;
 import com.study.server.http.HttpResponse;
 import com.study.server.http.StatusCode;
 
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class RequestDispatcherImpl implements RequestDispatcher {
@@ -12,12 +13,13 @@ public class RequestDispatcherImpl implements RequestDispatcher {
 
     public RequestDispatcherImpl(Set<Controller> controllers) {
         if (controllers == null || controllers.isEmpty()) {
-            throw new RuntimeException("The set of controllers is empty");
+            throw new NoSuchElementException("The set of controllers is empty");
         }
 
         this.controllers = controllers;
     }
 
+    @Override
     public HttpResponse dispatch(HttpRequest request) {
         for (Controller controller : controllers) {
             if (controller.match(request)) {

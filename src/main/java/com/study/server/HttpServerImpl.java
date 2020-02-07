@@ -7,18 +7,17 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class HttpServerImpl implements HttpServer {
-    private int port;
-    private int poolSize;
-    private boolean isStopped = false;
-    private ServerSocket serverSocket = null;
-    private ExecutorService executor;
-    private SocketHandlerFactoryImpl socketHandlerFactory;
+    private final int port;
+    private boolean stopped;
+    private ServerSocket serverSocket;
+    private final ExecutorService executor;
+    private final SocketHandlerFactoryImpl shFactory;
 
     public HttpServerImpl(ServerConfiguration config, SocketHandlerFactoryImpl shf) {
         port = config.getPort();
-        poolSize = config.getPoolSize();
+        int poolSize = config.getPoolSize();
         executor = Executors.newFixedThreadPool(poolSize);
-        socketHandlerFactory = shf;
+        shFactory = shf;
     }
 
     @Override
@@ -26,7 +25,7 @@ public class HttpServerImpl implements HttpServer {
         try {
             serverSocket = new ServerSocket(port);
         } catch (IOException e) {
-            throw new RuntimeException("Cannot open port " + port, e);
+            throw new IllegalArgumentException("Cannot open port " + port, e);
         }
 
         while (!isStopped()) {
@@ -37,26 +36,36 @@ public class HttpServerImpl implements HttpServer {
                 if (isStopped()) {
                     System.out.println("Server stopped");
                     break;
+                } else {
+                    stop();
                 }
-                throw new RuntimeException(
+                throw new IllegalArgumentException(
                         "Error accepting client connection", e);
+            } finally {
+                try {
+                    if (clientSocket != null) {
+                        clientSocket.close();
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
-            executor.execute(socketHandlerFactory.createSocketHandler(clientSocket));
+            executor.execute(shFactory.createSocketHandler(clientSocket));
         }
         executor.shutdown();
         System.out.println("Server stopped");
     }
 
-    private synchronized boolean isStopped() {
-        return isStopped;
+    private boolean isStopped() {
+        return stopped;
     }
 
-    public synchronized void stop() {
-        isStopped = true;
+    public void stop() {
+        stopped = true;
         try {
             serverSocket.close();
         } catch (IOException e) {
-            throw new RuntimeException("Error closing server", e);
+            throw new IllegalArgumentException("Error closing server", e);
         }
     }
 }
