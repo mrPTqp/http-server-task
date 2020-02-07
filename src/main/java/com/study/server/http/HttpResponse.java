@@ -1,5 +1,6 @@
 package com.study.server.http;
 
+import java.nio.charset.StandardCharsets;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Objects;
@@ -35,23 +36,28 @@ public class HttpResponse {
 
     public byte[] toBytes() {
         StringBuilder sb = new StringBuilder();
-        sb.append(protocol).append(" ").append(statusCode).append("\r\n");
+        sb.append(protocol).append(' ').append(statusCode).append("\r\n");
         headers.forEach((k, v) -> sb.append(k).append(": ").append(v).append("\r\n"));
-        sb.append("\r\n");
-        sb.append(body);
-        return sb.toString().getBytes();
+        sb.append("\r\n").append(body);
+        return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
         HttpResponse response = (HttpResponse) o;
 
-        return Objects.equals(protocol, response.protocol) &&
-                Objects.equals(statusCode, response.statusCode) &&
-                Objects.equals(headers, response.headers) &&
-                Objects.equals(body, response.body);
+        return Objects.equals(protocol, response.protocol)
+                && Objects.equals(statusCode, response.statusCode)
+                && Objects.equals(headers, response.headers)
+                && Objects.equals(body, response.body);
     }
 
     @Override
@@ -64,9 +70,6 @@ public class HttpResponse {
         private String statusCode = StatusCode._400.toString();
         private Map<String, String> headers = Collections.emptyMap();
         private String body = "";
-
-        public Builder() {
-        }
 
         public Builder setProtocol(String protocol) {
             this.protocol = protocol;

@@ -1,5 +1,8 @@
 plugins {
     id 'java'
+    id 'checkstyle'
+    id "com.github.spotbugs" version "3.0.0"
+    id 'pmd'
 }
 
 jar {
@@ -20,6 +23,29 @@ repositories {
 dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
+    spotbugsPlugins 'com.h3xstream.findsecbugs:findsecbugs-plugin:1.7.1'
+}
+
+checkstyle {
+    toolVersion '8.29'
+    configFile file("config/checkstyle/google_checks.xml")
+}
+checkstyleMain {
+    source ='src/main/java'
+}
+checkstyleTest {
+    source ='src/test/java'
+}
+
+spotbugs {
+    toolVersion = '3.1.12'
+    excludeFilter = file("$rootDir/config/spotbugs/exclude.xml")
+}
+
+pmd {
+    toolVersion = '6.21.0'
+    ruleSets = []
+    ruleSetFiles = files("config/pmd/myRuleSet.xml")
 }
 
 test {

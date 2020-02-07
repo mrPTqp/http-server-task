@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<FindBugsFilter>
+    <Match>
+        <Class name="com.study.server.ConfigurationReaderImpl"/>
+        <Bug code="SECPTI,SECUSS"/>
+    </Match>
+    <Match>
+        <Class name="com.study.server.HttpServerImpl"/>
+        <Bug code="SECUSS"/>
+    </Match>
+    <Match>
+        <Class name="com.study.server.utils.HttpPatternsUtils"/>
+        <Bug code="SECRD"/>
+    </Match>
+    <!--TESTS-->
+    <Match>
+        <Class name="com.study.server.utils.SocketMock"/>
+        <Bug code="SECUS"/>
+    </Match>
+
+    <!--TEMP-->
+    <Match>
+        <Class name="com.study.server.controller.FileController"/>
+    </Match>
+</FindBugsFilter>
