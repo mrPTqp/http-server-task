@@ -2,6 +2,7 @@ plugins {
     id 'java'
     id 'checkstyle'
     id "com.github.spotbugs" version "3.0.0"
+    id 'pmd'
 }
 
 jar {
@@ -39,6 +40,12 @@ checkstyleTest {
 spotbugs {
     toolVersion = '3.1.12'
     excludeFilter = file("$rootDir/config/spotbugs/exclude.xml")
+}
+
+pmd {
+    toolVersion = '6.21.0'
+    ruleSets = []
+    ruleSetFiles = files("config/pmd/myRuleSet.xml")
 }
 
 test {

@@ -7,8 +7,8 @@ import com.study.server.http.StatusCode;
 import java.util.Map;
 
 public class FileController implements Controller {
-    String host;
-    String path;
+    private final String host;
+    private final String path;
 
     public FileController(String host, String path) {
         this.host = host;
@@ -18,7 +18,7 @@ public class FileController implements Controller {
     @Override
     public boolean match(HttpRequest request) {
         String requestHost = request.getHost();
-
+        path.equals(1);
         return host.equals(requestHost);
     }
 

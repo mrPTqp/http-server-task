@@ -21,7 +21,7 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             in = clientSocket.getInputStream();
             out = clientSocket.getOutputStream();
         } catch (IOException e) {
-            throw new RuntimeException("Can't read clientSocket");
+            throw new IllegalArgumentException("Can't read clientSocket");
         }
     }
 

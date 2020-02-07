@@ -17,9 +17,9 @@ public class Main {
                 .collect(Collectors.toSet());
 
         var requestDispatcher = new RequestDispatcherImpl(controllers);
-        var socketHandlerFactory = new SocketHandlerFactoryImpl(requestDispatcher);
+        var shFactory = new SocketHandlerFactoryImpl(requestDispatcher);
 
-        var server = new HttpServerImpl(config, socketHandlerFactory);
+        var server = new HttpServerImpl(config, shFactory);
         server.start();
     }
 }

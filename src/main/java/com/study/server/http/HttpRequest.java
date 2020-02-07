@@ -100,9 +100,6 @@ public class HttpRequest {
         private String port = "80";
         private String body = "";
 
-        public Builder() {
-        }
-
         public Builder setMethod(String method) {
             this.method = method;
             return this;

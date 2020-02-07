@@ -9,7 +9,7 @@
         <Bug code="SECUSS"/>
     </Match>
     <Match>
-        <Class name="com.study.server.utils.HttpPatterns"/>
+        <Class name="com.study.server.utils.HttpPatternsUtils"/>
         <Bug code="SECRD"/>
     </Match>
     <!--TESTS-->

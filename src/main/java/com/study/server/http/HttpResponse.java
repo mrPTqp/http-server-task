@@ -36,10 +36,9 @@ public class HttpResponse {
 
     public byte[] toBytes() {
         StringBuilder sb = new StringBuilder();
-        sb.append(protocol).append(" ").append(statusCode).append("\r\n");
+        sb.append(protocol).append(' ').append(statusCode).append("\r\n");
         headers.forEach((k, v) -> sb.append(k).append(": ").append(v).append("\r\n"));
-        sb.append("\r\n");
-        sb.append(body);
+        sb.append("\r\n").append(body);
         return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 
@@ -71,9 +70,6 @@ public class HttpResponse {
         private String statusCode = StatusCode._400.toString();
         private Map<String, String> headers = Collections.emptyMap();
         private String body = "";
-
-        public Builder() {
-        }
 
         public Builder setProtocol(String protocol) {
             this.protocol = protocol;

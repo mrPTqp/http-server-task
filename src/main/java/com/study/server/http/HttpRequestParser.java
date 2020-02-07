@@ -1,7 +1,7 @@
 package com.study.server.http;
 
 import com.study.server.exceptions.BadRequestException;
-import com.study.server.utils.HttpPatterns;
+import com.study.server.utils.HttpPatternsUtils;
 import com.study.server.utils.StringUtils;
 
 import java.io.BufferedReader;
@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.regex.Matcher;
 
-public class HttpRequestParser {
+public final class HttpRequestParser {
 
     private HttpRequestParser() {
     }
@@ -23,21 +23,21 @@ public class HttpRequestParser {
 
         try {
             var curLine = br.readLine();
-            var matcher = HttpPatterns.mainString.matcher(curLine);
+            var matcher = HttpPatternsUtils.MAIN_STRING.matcher(curLine);
             matcher.find();
 
             var method = matcher.group("method");
-            if (!StringUtils.isEmpty(method)) {
-                builder.setMethod(methodParse(method));
-            } else {
+            if (StringUtils.isEmpty(method)) {
                 throw new BadRequestException("Method is mandatory!");
+            } else {
+                builder.setMethod(methodParse(method));
             }
 
             var path = matcher.group("path");
-            if (!StringUtils.isEmpty(path)) {
-                builder.setPath(path);
-            } else {
+            if (StringUtils.isEmpty(path)) {
                 builder.setPath("");
+            } else {
+                builder.setPath(path);
             }
 
             var parameters = matcher.group("parameters");
@@ -93,7 +93,7 @@ public class HttpRequestParser {
 
     private static Map<String, String> queryParse(String parameters) {
         Map<String, String> queryParameters = new HashMap<>();
-        Matcher pairsMatcher = HttpPatterns.pairsPattern.matcher(parameters);
+        Matcher pairsMatcher = HttpPatternsUtils.PAIRS_PATTERN.matcher(parameters);
 
         while (pairsMatcher.find()) {
             var key = pairsMatcher.group("key").toLowerCase();
@@ -110,7 +110,7 @@ public class HttpRequestParser {
     }
 
     private static Map.Entry<String, String> headersParse(String curLine) {
-        var matcher = HttpPatterns.headersPattern.matcher(curLine);
+        var matcher = HttpPatternsUtils.HEADERS_PATTERN.matcher(curLine);
         matcher.find();
         var key = matcher.group("key").toLowerCase();
         var value = matcher.group("value").trim().toLowerCase();
@@ -125,7 +125,7 @@ public class HttpRequestParser {
 
     private static String extractHost(Map<String, String> headers) {
         var hostLine = headers.get("host");
-        var matcher = HttpPatterns.hostPattern.matcher(hostLine);
+        var matcher = HttpPatternsUtils.HOST_PATTERN.matcher(hostLine);
         matcher.find();
 
         return matcher.group("host");
@@ -133,7 +133,7 @@ public class HttpRequestParser {
 
     private static String extractPort(Map<String, String> headers) {
         var hostLine = headers.get("host");
-        var matcher = HttpPatterns.hostPattern.matcher(hostLine);
+        var matcher = HttpPatternsUtils.HOST_PATTERN.matcher(hostLine);
         matcher.find();
 
         if (matcher.group("port") == null) {
