@@ -17,7 +17,7 @@ class HttpRequestParserTest {
     @Test
     @DisplayName("Should parse GET request case-insensitive headers")
     void parseGet() {
-        var expectedRequest = HttpRequestGenerator.createGetRequest();
+        var expectedRequest = HttpRequestGenerator.createGetRequest1();
 
         var is = readFile("GET");
         var bis = new BufferedInputStream(is);
