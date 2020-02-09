@@ -29,7 +29,7 @@ public class HttpServerImpl implements HttpServer {
         }
 
         while (!isStopped()) {
-            Socket clientSocket = null;
+            Socket clientSocket;
             try {
                 clientSocket = serverSocket.accept();
             } catch (IOException e) {
@@ -41,14 +41,6 @@ public class HttpServerImpl implements HttpServer {
                 }
                 throw new IllegalArgumentException(
                         "Error accepting client connection", e);
-            } finally {
-                try {
-                    if (clientSocket != null) {
-                        clientSocket.close();
-                    }
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
             }
             executor.execute(shFactory.createSocketHandler(clientSocket));
         }
