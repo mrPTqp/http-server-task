@@ -14,8 +14,10 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
     private final InputStream in;
     private final OutputStream out;
     private final RequestDispatcher requestDispatcher;
+    private final Socket clientSocket;
 
     public SocketHandlerImpl(Socket clientSocket, RequestDispatcher requestDispatcher) {
+        this.clientSocket = clientSocket;
         this.requestDispatcher = requestDispatcher;
         try {
             in = clientSocket.getInputStream();
@@ -29,9 +31,6 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
     public void run() {
         try {
             out.write(requestDispatcher.dispatch(HttpRequestParser.parse(in)).toBytes());
-
-            out.close();
-            in.close();
         } catch (BadRequestException e) {
             try {
                 respond(StatusCode._400.toString(), out);
@@ -40,6 +39,12 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             }
         } catch (IOException e) {
             e.printStackTrace();
+        } finally {
+            try {
+                clientSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
