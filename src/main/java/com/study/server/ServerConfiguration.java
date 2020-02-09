@@ -5,7 +5,7 @@ public class ServerConfiguration {
     private final int poolSize;
 
     public ServerConfiguration() {
-        port = 3333;
+        port = 80;
         poolSize = 20;
     }
 
