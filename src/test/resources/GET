@@ -1,4 +1,4 @@
-GET /css/style.css?name=dima&age=27 HTTP/1.1
+GET /css/foo.css?name=dima&age=27 HTTP/1.1
 Host: FOOD.com
 Accept: IMAGE/gif, image/x-xbitmap, image/jpeg, image/pjpeg, */*
 Accept-Language: ru

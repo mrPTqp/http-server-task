@@ -41,8 +41,8 @@ public class HttpRequestGenerator {
                 .build();
     }
 
-    public static HttpRequest createGetRequest() {
-        var path = "/css/style.css";
+    public static HttpRequest createGetRequest1() {
+        var path = "/css/foo.css";
         var parameters = Map.of("name", "dima", "age", "27");
         var host = "food.com";
 
@@ -53,6 +53,19 @@ public class HttpRequestGenerator {
                 Optional.of(parameters),
                 empty(),
                 Optional.of(host),
+                empty()
+        );
+    }
+
+    public static HttpRequest createGetRequest2() {
+
+        return prepareRequest(
+                empty(),
+                empty(),
+                empty(),
+                empty(),
+                empty(),
+                empty(),
                 empty()
         );
     }
