@@ -1,5 +1,7 @@
-package com.study.server;
+package com.study.server.rd;
 
+import com.study.server.RequestDispatcher;
+import com.study.server.RequestDispatcherImpl;
 import com.study.server.http.HttpResponse;
 import com.study.server.http.StatusCode;
 import com.study.server.utils.ControllerMock;
@@ -22,7 +24,7 @@ class RequestDispatcherImplTest {
                 .setStatusCode(StatusCode._200.toString())
                 .build();
 
-        HttpResponse response = requestDispatcher.dispatch(HttpRequestGenerator.createGetRequest());
+        HttpResponse response = requestDispatcher.dispatch(HttpRequestGenerator.createGetRequest1());
 
         assertEquals(expectedResponse, response);
     }

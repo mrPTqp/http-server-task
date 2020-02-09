@@ -17,6 +17,10 @@
         <Class name="com.study.server.utils.SocketMock"/>
         <Bug code="SECUS"/>
     </Match>
+    <Match>
+        <Class name="com.study.server.controller.FileControllerTest"/>
+        <Bug code="SECPTI"/>
+    </Match>
 
     <!--TEMP-->
     <Match>

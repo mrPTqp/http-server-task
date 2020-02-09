@@ -4,7 +4,11 @@ import com.study.server.http.HttpRequest;
 import com.study.server.http.HttpResponse;
 import com.study.server.http.StatusCode;
 
-import java.util.Map;
+import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class FileController implements Controller {
     private final String host;
@@ -17,17 +21,59 @@ public class FileController implements Controller {
 
     @Override
     public boolean match(HttpRequest request) {
-        String requestHost = request.getHost();
-        path.equals(1);
+        var requestHost = request.getHost();
         return host.equals(requestHost);
     }
 
     @Override
     public HttpResponse handle(HttpRequest request) {
-        return new HttpResponse.Builder().setProtocol("HTTP/1.1")
+        var requestPath = request.getPath();
+        var normalizePath = normalizePath(requestPath);
+        var path = Paths.get(normalizePath);
+
+        if (Files.exists(path)) {
+            try {
+
+                return new HttpResponse.Builder()
+                        .setProtocol("HTTP/1.1")
+                        .setStatusCode(StatusCode._200.toString())
+                        .setBody(getBodyString(path))
+                        .build();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        return new HttpResponse.Builder()
+                .setProtocol("HTTP/1.1")
                 .setStatusCode(StatusCode._404.toString())
-                .setHeaders(Map.of())
-                .setBody("body")
                 .build();
+    }
+
+    private String getBodyString(Path path) throws IOException {
+        var fis = Files.readAllLines(path);
+        var sb = new StringBuilder();
+
+        for (String b : fis) {
+            sb.append(b);
+        }
+        return sb.toString();
+    }
+
+    private String normalizePath(String rp) {
+        var requestPath = rp;
+        if (requestPath == null) {
+            requestPath = path + "index.html";
+        } else if (requestPath.endsWith("/")) {
+            requestPath = path + requestPath + "index.html";
+        } else {
+            requestPath = path + requestPath;
+        }
+
+        if ("/".equals(File.separator)) {
+            return requestPath.replace("\\", "/");
+        } else {
+            return requestPath.replace("/", "\\");
+        }
     }
 }
