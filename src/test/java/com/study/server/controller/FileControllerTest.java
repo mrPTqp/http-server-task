@@ -17,7 +17,7 @@ import static org.junit.jupiter.api.Assertions.*;
 class FileControllerTest {
 
     @Test
-    @DisplayName("Should match the request to the controller if the controller and host have the same host")
+    @DisplayName("Controller should match request for configured host")
     void match1() {
         var controller = new FileController("food.com", "123");
 
@@ -25,7 +25,7 @@ class FileControllerTest {
     }
 
     @Test
-    @DisplayName("Should not match the request to the controller if the controller and host have different host")
+    @DisplayName("The controller should not match request for unrecognized host")
     void match2() {
         var controller = new FileController("food1.com", "123");
 
@@ -33,7 +33,7 @@ class FileControllerTest {
     }
 
     @Test
-    @DisplayName("Should return a response matching the request")
+    @DisplayName("Should return a response matching the request with root path")
     void handle1() throws URISyntaxException, IOException {
         var host = "food.com";
         var hostUri = FileController.class.getClassLoader().getResource(host).toURI();
@@ -52,7 +52,7 @@ class FileControllerTest {
     }
 
     @Test
-    @DisplayName("Should return a response matching the request")
+    @DisplayName("Should return a response matching the request with \"/css/foo.css\" path")
     void handle2() throws URISyntaxException, IOException {
         var host = "food.com";
         var hostUri = FileController.class.getClassLoader().getResource(host).toURI();
@@ -89,11 +89,11 @@ class FileControllerTest {
     }
 
     private String getBodyString(Path path) throws IOException {
-        var fis = Files.readAllBytes(path);
+        var fis = Files.readAllLines(path);
         var sb = new StringBuilder();
 
-        for (byte b : fis) {
-            sb.append(b).append("\r\n");
+        for (String b : fis) {
+            sb.append(b);
         }
         return sb.toString();
     }

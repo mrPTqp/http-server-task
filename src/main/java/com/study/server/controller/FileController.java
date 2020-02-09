@@ -33,12 +33,11 @@ public class FileController implements Controller {
 
         if (Files.exists(path)) {
             try {
-                String bodyLine = getBodyString(path);
 
                 return new HttpResponse.Builder()
                         .setProtocol("HTTP/1.1")
                         .setStatusCode(StatusCode._200.toString())
-                        .setBody(bodyLine)
+                        .setBody(getBodyString(path))
                         .build();
             } catch (IOException e) {
                 e.printStackTrace();
@@ -52,11 +51,11 @@ public class FileController implements Controller {
     }
 
     private String getBodyString(Path path) throws IOException {
-        var fis = Files.readAllBytes(path);
+        var fis = Files.readAllLines(path);
         var sb = new StringBuilder();
 
-        for (byte b : fis) {
-            sb.append(b).append("\r\n");
+        for (String b : fis) {
+            sb.append(b);
         }
         return sb.toString();
     }
