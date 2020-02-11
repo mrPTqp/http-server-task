@@ -1,5 +1,6 @@
 package com.study.server.controller;
 
+import com.study.server.RequestDispatcherImpl;
 import com.study.server.http.HttpRequest;
 import com.study.server.http.HttpResponse;
 import com.study.server.http.StatusCode;
@@ -9,10 +10,13 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class FileController implements Controller {
     private final String host;
     private final String path;
+    private static final Logger LOGGER = Logger.getLogger(RequestDispatcherImpl.class.getName());
 
     public FileController(String host, String path) {
         this.host = host;
@@ -33,21 +37,23 @@ public class FileController implements Controller {
 
         if (Files.exists(path)) {
             try {
-
                 return new HttpResponse.Builder()
                         .setProtocol("HTTP/1.1")
                         .setStatusCode(StatusCode._200.toString())
                         .setBody(getBodyString(path))
                         .build();
             } catch (IOException e) {
-                e.printStackTrace();
+                LOGGER.log(Level.WARNING, e.toString() + "Response not created");
             }
         }
 
-        return new HttpResponse.Builder()
+        HttpResponse response = new HttpResponse.Builder()
                 .setProtocol("HTTP/1.1")
                 .setStatusCode(StatusCode._404.toString())
                 .build();
+        LOGGER.log(Level.INFO, "Response with code 404 created");
+
+        return response;
     }
 
     private String getBodyString(Path path) throws IOException {

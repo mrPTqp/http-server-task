@@ -11,13 +11,17 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Properties;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ConfigurationReaderImpl implements ConfigurationReader {
     private final String sourceDir;
+    private static final Logger LOGGER = Logger.getLogger(ConfigurationReaderImpl.class.getName());
 
     public ConfigurationReaderImpl() {
         sourceDir = System.getenv().get("CONF_DIR");
         if (sourceDir == null) {
+            LOGGER.log(Level.SEVERE, "Missing environment variable CONF_DIR");
             throw new IllegalArgumentException("Missing environment variable CONF_DIR");
         }
     }
@@ -34,8 +38,18 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
             port = Integer.parseInt(properties.getProperty("server.port"));
             poolSize = Integer.parseInt(properties.getProperty("server.pool-size"));
 
+            LOGGER.log(
+                    Level.INFO,
+                    "Parameters obtained from configuration file:\r\n"
+                            + "port = " + port + "\r\n"
+                            + "poolSize = " + poolSize
+            );
             return new ServerConfiguration(port, poolSize);
         } catch (IOException e) {
+            LOGGER.log(
+                    Level.INFO,
+                    "Configuration file cannot be read, port and poolSize accepted by default"
+            );
             return new ServerConfiguration();
         }
     }
@@ -46,6 +60,7 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
         File[] dirs = new File(sourceDir).listFiles(File::isDirectory);
 
         if (dirs == null) {
+            LOGGER.log(Level.SEVERE, "The configuration directory does not contain directories");
             throw new NoSuchElementException("The configuration directory does not contain directories");
         } else {
             for (File dir : dirs) {
@@ -59,7 +74,10 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
         }
 
         if (mappings.isEmpty()) {
+            LOGGER.log(Level.SEVERE, "The configuration directory does not contain valid site directories");
             throw new NoSuchElementException("The configuration directory does not contain valid site directories");
+        } else {
+            LOGGER.log(Level.INFO, "found " + mappings.size() + " directories with sites");
         }
 
         return Map.copyOf(mappings);
