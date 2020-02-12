@@ -13,7 +13,8 @@ public class HttpServerImpl implements HttpServer {
     private boolean stop;
     private final ExecutorService executor;
     private final SocketHandlerFactoryImpl shFactory;
-    private static final Logger LOGGER = Logger.getLogger(HttpServerImpl.class.getName());
+    @SuppressWarnings("PMD.FieldNamingConventions")
+    private static final Logger log = Logger.getLogger(HttpServerImpl.class.getName());
 
     public HttpServerImpl(ServerConfiguration config, SocketHandlerFactoryImpl shf) {
         port = config.getPort();
@@ -26,31 +27,31 @@ public class HttpServerImpl implements HttpServer {
     @SuppressWarnings({"PMD.CloseResource", "PMD.AvoidInstantiatingObjectsInLoops"})
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
-            LOGGER.info("The server is started with the following parameters: port = " + port
+            log.info("The server is started with the following parameters: port = " + port
                     + "; poolSize = " + poolSize);
 
             while (!stop) {
                 Socket clientSocket;
                 try {
                     clientSocket = serverSocket.accept();
-                    LOGGER.info("New connection established");
+                    log.info("New connection established");
                     executor.execute(shFactory.createSocketHandler(clientSocket));
                 } catch (IOException e) {
                     if (stop) {
-                        LOGGER.severe("Server is already stopped");
+                        log.severe("Server is already stopped");
                         break;
                     } else {
                         stop = true;
                     }
-                    LOGGER.warning("Error accepting client connection");
+                    log.severe("Error accepting client connection");
                     throw new IllegalArgumentException("Error accepting client connection");
                 }
             }
 
             executor.shutdown();
-            LOGGER.severe("Server is stopped");
+            log.severe("Server is stopped");
         } catch (IOException e) {
-            LOGGER.severe("Cannot open port " + port);
+            log.severe("Cannot open port " + port);
             throw new IllegalArgumentException("Cannot open port " + port);
         }
     }

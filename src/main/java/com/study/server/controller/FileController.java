@@ -15,7 +15,8 @@ import java.util.logging.Logger;
 public class FileController implements Controller {
     private final String host;
     private final String path;
-    private static final Logger LOGGER = Logger.getLogger(RequestDispatcherImpl.class.getName());
+    @SuppressWarnings("PMD.FieldNamingConventions")
+    private static final Logger log = Logger.getLogger(RequestDispatcherImpl.class.getName());
 
     public FileController(String host, String path) {
         this.host = host;
@@ -42,7 +43,7 @@ public class FileController implements Controller {
                         .setBody(getBodyString(path))
                         .build();
             } catch (IOException e) {
-                LOGGER.warning(e.toString() + " Response not created");
+                log.severe(e.toString() + " Response not created");
             }
         }
 
@@ -50,7 +51,7 @@ public class FileController implements Controller {
                 .setProtocol("HTTP/1.1")
                 .setStatusCode(StatusCode._404.toString())
                 .build();
-        LOGGER.info("Response with code 404 created");
+        log.info("Response with code 404 created");
 
         return response;
     }

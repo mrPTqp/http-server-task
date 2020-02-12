@@ -16,7 +16,8 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
     private final OutputStream out;
     private final RequestDispatcher requestDispatcher;
     private final Socket clientSocket;
-    private static final Logger LOGGER = Logger.getLogger(SocketHandlerImpl.class.getName());
+    @SuppressWarnings("PMD.FieldNamingConventions")
+    private static final Logger log = Logger.getLogger(SocketHandlerImpl.class.getName());
 
     public SocketHandlerImpl(Socket clientSocket, RequestDispatcher requestDispatcher) {
         this.clientSocket = clientSocket;
@@ -25,7 +26,7 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             in = clientSocket.getInputStream();
             out = clientSocket.getOutputStream();
         } catch (IOException e) {
-            LOGGER.warning("Can't read clientSocket");
+            log.severe("Can't read clientSocket");
             throw new IllegalArgumentException("Can't read clientSocket");
         }
     }
@@ -38,15 +39,15 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             try {
                 respond(StatusCode._400.toString(), out);
             } catch (IOException ex) {
-                LOGGER.warning(ex.toString() + " Can't write response with code 404 in clientSocket");
+                log.severe(ex.toString() + " Can't write response with code 404 in clientSocket");
             }
         } catch (IOException e) {
-            LOGGER.warning(e.toString() + " Can't write response in clientSocket");
+            log.severe(e.toString() + " Can't write response in clientSocket");
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                LOGGER.warning(e.toString() + " Can't close clientSocket");
+                log.severe(e.toString() + " Can't close clientSocket");
             }
         }
     }

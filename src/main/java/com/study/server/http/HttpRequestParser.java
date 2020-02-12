@@ -14,7 +14,8 @@ import java.util.logging.Logger;
 import java.util.regex.Matcher;
 
 public final class HttpRequestParser {
-    private static final Logger LOGGER = Logger.getLogger(HttpRequestParser.class.getName());
+    @SuppressWarnings("PMD.FieldNamingConventions")
+    private static final Logger log = Logger.getLogger(HttpRequestParser.class.getName());
 
     private HttpRequestParser() {
     }
@@ -30,7 +31,7 @@ public final class HttpRequestParser {
 
             var method = matcher.group("method");
             if (StringUtils.isEmpty(method)) {
-                LOGGER.warning("Method is mandatory!");
+                log.severe("Method is mandatory!");
                 throw new BadRequestException("Method is mandatory!");
             } else {
                 builder.setMethod(methodParse(method));
@@ -52,7 +53,7 @@ public final class HttpRequestParser {
             if (checkProtocol(protocol)) {
                 builder.setProtocol(protocol);
             } else {
-                LOGGER.warning("Supported only HTTP/1.1");
+                log.severe("Supported only HTTP/1.1");
                 throw new BadRequestException("Supported only HTTP/1.1");
             }
 
@@ -73,7 +74,7 @@ public final class HttpRequestParser {
         } catch (BadRequestException e) {
             throw e;
         } catch (Exception e) {
-            LOGGER.warning("Can't parse request");
+            log.severe("Can't parse request");
             throw new BadRequestException("Can't parse request");
         }
         return builder.build();
@@ -92,7 +93,7 @@ public final class HttpRequestParser {
         if (methodIsSupported) {
             return method;
         } else {
-            LOGGER.warning("Method not supported");
+            log.severe("Method not supported");
             throw new BadRequestException("Method not supported");
         }
     }
@@ -123,7 +124,7 @@ public final class HttpRequestParser {
         var headers = Map.entry(key, value);
 
         if (headers.getKey().equals("") || headers.getValue().equals("")) {
-            LOGGER.warning("Syntax error in header");
+            log.severe("Syntax error in header");
             throw new BadRequestException("Syntax error in header");
         } else {
             return headers;

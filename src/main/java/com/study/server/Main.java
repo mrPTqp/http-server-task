@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
 
 public class Main {
     public static void main(String[] args) {
-        final Logger logger = Logger.getLogger(Main.class.getName());
+        final Logger log = Logger.getLogger(Main.class.getName());
 
         var cr = new ConfigurationReaderImpl();
         var config = cr.readConfig();
@@ -19,7 +19,7 @@ public class Main {
                 .stream()
                 .map(e -> new FileController(e.getKey(), e.getValue()))
                 .collect(Collectors.toSet());
-        logger.info(controllers.size() + " controllers created");
+        log.info(controllers.size() + " controllers created");
 
         var requestDispatcher = new RequestDispatcherImpl(controllers);
         var shFactory = new SocketHandlerFactoryImpl(requestDispatcher);
