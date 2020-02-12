@@ -12,7 +12,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 
-import static org.junit.jupiter.api.Assertions.*;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 class FileControllerTest {
 
@@ -86,6 +88,21 @@ class FileControllerTest {
         HttpResponse response = controller.handle(request);
 
         assertEquals(expectedResponse, response);
+    }
+
+    @Test
+    @DisplayName("Should return the same answer upon repeated call")
+    void handle4() throws URISyntaxException {
+        var host = "food.com";
+        var hostUri = FileController.class.getClassLoader().getResource(host).toURI();
+        var hostPath = Paths.get(hostUri).toString();
+        var controller = new FileController(host, hostPath);
+        var request = HttpRequestGenerator.createGetRequest2();
+
+        HttpResponse response1 = controller.handle(request);
+        HttpResponse response2 = controller.handle(request);
+
+        assertEquals(response1.toString(), response2.toString());
     }
 
     private String getBodyString(Path path) throws IOException {
