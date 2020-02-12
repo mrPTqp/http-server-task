@@ -36,9 +36,9 @@ public class HttpResponse {
 
     public byte[] toBytes() {
         StringBuilder sb = new StringBuilder();
-        sb.append(protocol).append(' ').append(statusCode).append("\r\n");
-        headers.forEach((k, v) -> sb.append(k).append(": ").append(v).append("\r\n"));
-        sb.append("\r\n").append(body);
+        sb.append(protocol).append(' ').append(statusCode).append('\n');
+        headers.forEach((k, v) -> sb.append(k).append(": ").append(v).append('\n'));
+        sb.append('\n').append(body);
         return sb.toString().getBytes(StandardCharsets.UTF_8);
     }
 

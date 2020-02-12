@@ -4,7 +4,6 @@ import com.study.server.controller.Controller;
 import com.study.server.controller.FileController;
 
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
@@ -20,7 +19,7 @@ public class Main {
                 .stream()
                 .map(e -> new FileController(e.getKey(), e.getValue()))
                 .collect(Collectors.toSet());
-        logger.log(Level.INFO, controllers.size() + " controllers created");
+        logger.info(controllers.size() + " controllers created");
 
         var requestDispatcher = new RequestDispatcherImpl(controllers);
         var shFactory = new SocketHandlerFactoryImpl(requestDispatcher);

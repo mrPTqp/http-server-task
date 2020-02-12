@@ -10,7 +10,6 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class FileController implements Controller {
@@ -43,7 +42,7 @@ public class FileController implements Controller {
                         .setBody(getBodyString(path))
                         .build();
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, e.toString() + "Response not created");
+                LOGGER.warning(e.toString() + "Response not created");
             }
         }
 
@@ -51,7 +50,7 @@ public class FileController implements Controller {
                 .setProtocol("HTTP/1.1")
                 .setStatusCode(StatusCode._404.toString())
                 .build();
-        LOGGER.log(Level.INFO, "Response with code 404 created");
+        LOGGER.info("Response with code 404 created");
 
         return response;
     }

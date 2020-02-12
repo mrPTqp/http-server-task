@@ -9,7 +9,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
-import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class SocketHandlerImpl implements SocketHandler, Runnable {
@@ -26,7 +25,7 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             in = clientSocket.getInputStream();
             out = clientSocket.getOutputStream();
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Can't read clientSocket");
+            LOGGER.warning("Can't read clientSocket");
             throw new IllegalArgumentException("Can't read clientSocket");
         }
     }
@@ -39,21 +38,21 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             try {
                 respond(StatusCode._400.toString(), out);
             } catch (IOException ex) {
-                LOGGER.log(Level.WARNING, ex.toString() + "Can't write response with code 404 in clientSocket");
+                LOGGER.warning(ex.toString() + "Can't write response with code 404 in clientSocket");
             }
         } catch (IOException e) {
-            LOGGER.log(Level.WARNING, e.toString() + "Can't write response in clientSocket");
+            LOGGER.warning(e.toString() + "Can't write response in clientSocket");
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                LOGGER.log(Level.WARNING, e.toString() + "Can't close clientSocket");
+                LOGGER.warning(e.toString() + "Can't close clientSocket");
             }
         }
     }
 
     private void respond(String statusCode, OutputStream out) throws IOException {
-        String responseLine = "HTTP/1.1 " + statusCode + "\r\n\r\n";
+        String responseLine = "HTTP/1.1 " + statusCode + "\n\n";
         out.write(responseLine.getBytes(StandardCharsets.UTF_8));
     }
 }
