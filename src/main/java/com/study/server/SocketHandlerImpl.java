@@ -9,12 +9,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.nio.charset.StandardCharsets;
+import java.util.logging.Logger;
 
 public class SocketHandlerImpl implements SocketHandler, Runnable {
     private final InputStream in;
     private final OutputStream out;
     private final RequestDispatcher requestDispatcher;
     private final Socket clientSocket;
+    @SuppressWarnings("PMD.FieldNamingConventions")
+    private static final Logger log = Logger.getLogger(SocketHandlerImpl.class.getName());
 
     public SocketHandlerImpl(Socket clientSocket, RequestDispatcher requestDispatcher) {
         this.clientSocket = clientSocket;
@@ -23,6 +26,7 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             in = clientSocket.getInputStream();
             out = clientSocket.getOutputStream();
         } catch (IOException e) {
+            log.severe("Can't read clientSocket");
             throw new IllegalArgumentException("Can't read clientSocket");
         }
     }
@@ -35,21 +39,21 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             try {
                 respond(StatusCode._400.toString(), out);
             } catch (IOException ex) {
-                ex.printStackTrace();
+                log.severe(ex.toString() + " Can't write response with code 404 in clientSocket");
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            log.severe(e.toString() + " Can't write response in clientSocket");
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+                log.severe(e.toString() + " Can't close clientSocket");
             }
         }
     }
 
     private void respond(String statusCode, OutputStream out) throws IOException {
-        String responseLine = "HTTP/1.1 " + statusCode + "\r\n\r\n";
+        String responseLine = "HTTP/1.1 " + statusCode + "\n\n";
         out.write(responseLine.getBytes(StandardCharsets.UTF_8));
     }
 }

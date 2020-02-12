@@ -11,6 +11,7 @@
     <rule ref="category/java/bestpractices.xml">
         <exclude name="PreserveStackTrace"/>
         <exclude name="JUnitAssertionsShouldIncludeMessage"/>
+        <exclude name="GuardLogStatement"/>
         <!--TEMP-->
         <exclude name="SystemPrintln"/>
         <exclude name="AvoidPrintStackTrace"/>
