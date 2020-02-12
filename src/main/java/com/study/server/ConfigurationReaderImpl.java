@@ -37,7 +37,7 @@ public class ConfigurationReaderImpl implements ConfigurationReader {
             port = Integer.parseInt(properties.getProperty("server.port"));
             poolSize = Integer.parseInt(properties.getProperty("server.pool-size"));
 
-            LOGGER.info("Parameters obtained from configuration file: port = " + port + "poolSize = " + poolSize);
+            LOGGER.info("Parameters obtained from configuration file: port = " + port + "; poolSize = " + poolSize);
 
             return new ServerConfiguration(port, poolSize);
         } catch (IOException e) {

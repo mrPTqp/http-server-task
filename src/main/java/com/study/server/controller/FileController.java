@@ -42,7 +42,7 @@ public class FileController implements Controller {
                         .setBody(getBodyString(path))
                         .build();
             } catch (IOException e) {
-                LOGGER.warning(e.toString() + "Response not created");
+                LOGGER.warning(e.toString() + " Response not created");
             }
         }
 

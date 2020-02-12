@@ -38,15 +38,15 @@ public class SocketHandlerImpl implements SocketHandler, Runnable {
             try {
                 respond(StatusCode._400.toString(), out);
             } catch (IOException ex) {
-                LOGGER.warning(ex.toString() + "Can't write response with code 404 in clientSocket");
+                LOGGER.warning(ex.toString() + " Can't write response with code 404 in clientSocket");
             }
         } catch (IOException e) {
-            LOGGER.warning(e.toString() + "Can't write response in clientSocket");
+            LOGGER.warning(e.toString() + " Can't write response in clientSocket");
         } finally {
             try {
                 clientSocket.close();
             } catch (IOException e) {
-                LOGGER.warning(e.toString() + "Can't close clientSocket");
+                LOGGER.warning(e.toString() + " Can't close clientSocket");
             }
         }
     }

@@ -27,7 +27,7 @@ public class HttpServerImpl implements HttpServer {
     public void start() {
         try (ServerSocket serverSocket = new ServerSocket(port)) {
             LOGGER.info("The server is started with the following parameters: port = " + port
-                    + "poolSize = " + poolSize);
+                    + "; poolSize = " + poolSize);
 
             while (!stop) {
                 Socket clientSocket;
