@@ -10,11 +10,17 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.logging.Logger;
 
 public class FileController implements Controller {
     private final String host;
     private final String path;
     private final ConcurrentHashMap<String, HttpResponse> cache = new ConcurrentHashMap<>();
+    private int allReqCounter;
+    private int cachedReqCounter;
+    private float cacheRate;
+    @SuppressWarnings("PMD.FieldNamingConventions")
+    private static final Logger log = Logger.getLogger(FileController.class.getName());
 
     public FileController(String host, String path) {
         this.host = host;
@@ -29,6 +35,7 @@ public class FileController implements Controller {
 
     @Override
     public HttpResponse handle(HttpRequest request) {
+        ++allReqCounter;
         var requestPath = request.getPath();
         var normalizePath = normalizePath(requestPath);
 
@@ -55,6 +62,10 @@ public class FileController implements Controller {
                     .setStatusCode(StatusCode._404.toString())
                     .build();
         } else {
+            ++cachedReqCounter;
+            cacheRate = (float) cachedReqCounter / (float) allReqCounter;
+            log.info("CacheRate = " + cacheRate);
+
             return cache.get(normalizePath);
         }
     }
