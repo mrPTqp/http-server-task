@@ -53,8 +53,8 @@ public final class HttpRequestParser {
             if (checkProtocol(protocol)) {
                 builder.setProtocol(protocol);
             } else {
-                log.severe("Supported only HTTP/1.1");
-                throw new BadRequestException("Supported only HTTP/1.1");
+                log.severe("Supported only HTTP/1.0 or HTTP/1.1");
+                throw new BadRequestException("Supported only HTTP/1.0 or HTTP/1.1");
             }
 
             curLine = br.readLine();
@@ -112,8 +112,9 @@ public final class HttpRequestParser {
     }
 
     private static boolean checkProtocol(String protocol) {
-        var defaultProtocol = "HTTP/1.1";
-        return defaultProtocol.equals(protocol);
+        var defaultProtocol1 = "HTTP/1.0";
+        var defaultProtocol2 = "HTTP/1.1";
+        return defaultProtocol1.equals(protocol) || defaultProtocol2.equals(protocol);
     }
 
     private static Map.Entry<String, String> headersParse(String curLine) {
